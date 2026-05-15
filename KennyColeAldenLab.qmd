@@ -26,5 +26,6 @@ You can add options to executable code like this
 
 ```{r}
 # This is cole's edit
+# This is alden's edit
 3 * 3
 ```
