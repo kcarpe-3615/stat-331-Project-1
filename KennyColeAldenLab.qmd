@@ -1,31 +1,78 @@
 ---
-title: "LAB KCA"
+title: "Project Checkpoint 3"
 author: "Kenny, Cole, Alden"
 format: html
-editor: visual
+editor: source
 ---
 
-## Quarto
+## The Data
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+The following link displays the Kaggle source for one of the csvs used in this lab: <https://www.kaggle.com/datasets/ahmedalmadami/2020-2023-nba-data/data>
 
-## Running Code
+This dataset contains NBA player performance statistics from the 2020-2023 NBA seasons. Each row shows the stats for a particular player in a particular season between 2020-2023. There are a number of different variables that fall into following categories:
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+-   Player Context: nationality, college, name, height, weight, age
+-   Injury Statistics: games missed, cash earned while out, type of injury
+-   Team Context: wins, losses, team, division
+-   A wide array of advanced game performance stats.
+
+The following link displays the Kaggle source for the second csv used in this lab: <https://www.kaggle.com/code/rizal1015/nba-salaries?select=nba_salaries.csv>
+
+This csv contains information primarily on each individual players NBA salary and player performance statistics during the 2023 season. This data differs from the previous dataset in that player position, salary, and different player performance statistics are being used.
+
+These datasets are collectively useful to analyze player productivity, salary trends, compare performance between seasons, and identify statistical trends among NBA players. In addition, using these two sources will allow students to practice joining and cleaning datasets in order to solve problems throughout this lab.
+
+## Read in Datasets + Load Packages
 
 ```{r}
-1 + 1
-```
-
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
+# Load in Necessary Packages
+library(tidyverse)
+library(knitr)
 ```
 
 ```{r}
-# This is cole's edit
-# This is alden's edit
-3 * 3
+# Read in the Datasets
+nba_data <- read_csv("nba_data.csv")
+nba_salary <- read_csv("nba_salaries.csv")
 ```
+
+## Question 1
+
+**1. Join the 2023 NBA salary dataset with the "nba_data" dataset. Keep only the player name, position, and salary columns from the NBA salary data set to avoid advanced statistics redundancy. Keep only players who appear in both datasets and ensure the data only comes from the 2023 season.**
+
+```{r}
+# Code for Question 1
+nba_combined <- nba_salary |>
+  select(`Player Name`, Position, Salary) |>
+  inner_join(nba_data,
+             by = c("Player Name" = "Player")) |> 
+  filter(Season == 2023)
+```
+
+## Question 2
+
+Now that we have the combined dataset, we would like to analyze high performing positions in the NBA to see if their position is currently being underpaid or overpaid. Win shares is a valuable NBA statistic that estimates the number of wins that a player contributed to their teams success. Since this variable has the potential to be influenced by players who play more minutes throughout a season, we can use the `WS/48` variable which produces the win shares estimated per 48 minutes which reduces the influence of a player playing more minutes. 
+
+**2. Using the combined dataset we just made, calculate the overall median NBA salary. Then, create a nicely formatted table with one row for each position containing the following variables:**
+
+-   median Win Shares per 48 minutes (WS/48)
+-   median salary by position
+-   the difference between the position median salary and the overall NBA median salary
+-   the number of players in each position
+
+**Only include positions with more than 10 players, and order the rows from highest to lowest median Win Shares.**
+
+```{r}
+nba_combined |>
+  mutate(tot_median = median(Salary.x, na.rm = T)) |> 
+  group_by(Position) |>
+  summarize(`median_WS/48` = median(`WS/48`, na.rm = T),
+            median_position = median(Salary.x, na.rm = T),
+            salary_difference = median_position - mean(tot_median),
+            players = n()) |>
+  filter(players > 10) |> 
+  arrange(desc(`median_WS/48`)) |>
+  kable()
+```
+
+## Question 3
