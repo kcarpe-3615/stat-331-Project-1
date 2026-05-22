@@ -76,9 +76,11 @@ nba_combined |>
 ```
 
 ## Question 3
-Write a function that takes in a position and returns a summary table for players in that position. The table should include each player’s name, salary, WS/48, VORP, games missed, and a new variable called salary_per_WS48, calculated as salary divided by WS/48. Use the function to compare two different positions from Question 2 and determine which position appears to provide better value relative to salary.
-# Code for Question 3
 
+In Question 2, we compared positions using median salary and median WS/48 separately, but those summaries don't directly tell us how efficiently teams are spending money on individual players. A player who produces high win shares on a small contract represents much better value than a similarly productive player on a max contract. To explore this, we can build a reusable function that summarizes player-level value within a single position, making it easy to compare any two positions side-by-side.
+**Write a function that takes in a position and returns a summary table for players in that position. The table should include each player’s name, salary, WS/48, VORP, games missed, and a new variable called salary_per_WS48, calculated as salary divided by WS/48. Use the function to compare two different positions from Question 2 and determine which position appears to provide better value relative to salary.**
+
+# Code for Question 3
 ```{r}
 position_value <- function(pos_name) {
   nba_combined |>
@@ -112,4 +114,92 @@ position_value <- function(pos_name) {
 
 position_value("PG")
 position_value("C")
+```
+
+
+## Question 4
+
+While the tables from Question 3 are useful, a visualization can make value comparisons across positions much clearer. Using the combined dataset from Question 1, create a nicely formatted ggplot that compares WS/48 and Salary across positions. Your graph should:
+
+- Display all positions with more than 10 players (from Question 2)
+- Make it visually clear which positions tend to produce more win shares per dollar spent
+- Include informative axis labels, a title, and a caption noting the data source
+- Apply a clean theme (e.g., theme_minimal() or theme_bw())
+
+
 ```{r}
+#| label: q4-value-plot
+#| fig-width: 9
+#| fig-height: 6
+
+nba_combined |>
+  group_by(Position) |>
+  filter(n() > 10) |>
+  ungroup() |>
+  filter(!is.na(`WS/48`), !is.na(Salary.x)) |>
+  ggplot(aes(x = `WS/48`, y = Salary.x / 1e6, color = Position)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  scale_y_continuous(labels = scales::label_dollar(suffix = "M")) +
+  labs(
+    title = "Salary vs. Win Shares per 48 Minutes by Position",
+    subtitle = "Flatter trend lines indicate positions where higher salaries are not strongly tied to better production",
+    x = "Win Shares per 48 Minutes (WS/48)",
+    y = "Salary (2023 Season)",
+    color = "Position",
+    caption = "Source: Kaggle NBA datasets (2020–2023)"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(color = "gray40", size = 10),
+    legend.position = "bottom"
+  )
+```
+
+Based on the graph, point guards (PG) appear to provide the best value relative to salary and tend to cluster in the higher WS/48 range without commanding the highest salaries, meaning teams are getting strong per-minute production at a lower cost. Centers (C), by contrast, show a wider salary spread without a proportional increase in WS/48, suggesting some centers are overpaid relative to their win-share contribution. This is consistent with the conclusion from Question 3, where PGs had a lower salary-per-WS/48 than Cs.
+
+## Question 5
+
+While much of NBA analysis focuses on performance and salary, player availability is just as important — a star player who frequently misses games provides less value to their team than their per-game stats might suggest. Our dataset includes an `Injury` column containing free-text descriptions of each player's injury that season (e.g., "sprained left ankle," "torn ACL"). By extracting keywords from these descriptions, we can group similar injuries together and analyze how different injury types impact player availability.
+
+**5. Create a new variable called `injury_category` that classifies each player's injury as `"Knee"`, `"Ankle"`, `"Back"`, `"Hamstring"`, `"Other"`, or `"None"` based on keywords found in the `Injury` text. Then, create a nicely formatted table summarizing the number of players and the median number of games missed for each injury category, ordered from most to fewest median games missed. Which type of injury appears to be the most costly in terms of player availability?**
+
+````{r}
+#| label: q5-injury-categories
+
+nba_combined |>
+  mutate(
+    injury_lower = str_to_lower(Injury),
+    injury_category = case_when(
+      is.na(Injury) | Injury == ""           ~ "None",
+      str_detect(injury_lower, "knee|acl|mcl|meniscus") ~ "Knee",
+      str_detect(injury_lower, "ankle")      ~ "Ankle",
+      str_detect(injury_lower, "back|spine|lumbar")     ~ "Back",
+      str_detect(injury_lower, "hamstring")  ~ "Hamstring",
+      TRUE                                    ~ "Other"
+    )
+  ) |>
+  group_by(injury_category) |>
+  summarize(
+    players = n(),
+    median_games_missed = median(`Games Missed`, na.rm = TRUE)
+  ) |>
+  arrange(desc(median_games_missed)) |>
+  kable(
+    col.names = c("Injury Category", "Number of Players", "Median Games Missed"),
+    caption = "Player Availability by Injury Type (2023 Season)"
+  )
+````
+
+Based on the table, knee injuries appear to be the most costly in terms of player availability — players with knee injuries miss substantially more games on average than players with injuries to other body parts. This makes intuitive sense given that serious knee injuries (such as ACL or meniscus tears) often require surgery and lengthy rehabilitation, whereas ankle and hamstring injuries tend to heal more quickly. Teams may want to weigh injury history — especially knee-related injuries — more heavily when evaluating player contracts.
+
+
+
+
+
+
+
+
+
+
