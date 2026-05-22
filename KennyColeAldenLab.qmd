@@ -78,7 +78,8 @@ nba_combined |>
 ## Question 3
 
 In Question 2, we compared positions using median salary and median WS/48 separately, but those summaries don't directly tell us how efficiently teams are spending money on individual players. A player who produces high win shares on a small contract represents much better value than a similarly productive player on a max contract. To explore this, we can build a reusable function that summarizes player-level value within a single position, making it easy to compare any two positions side-by-side.
-**Write a function that takes in a position and returns a summary table for players in that position. The table should include each player’s name, salary, WS/48, VORP, games missed, and a new variable called salary_per_WS48, calculated as salary divided by WS/48. Use the function to compare two different positions from Question 2 and determine which position appears to provide better value relative to salary.**
+
+**3. Write a function that takes in a position and returns a summary table for players in that position. The table should include each player’s name, salary, WS/48, VORP, games missed, and a new variable called salary_per_WS48, calculated as salary divided by WS/48. Use the function to compare two different positions from Question 2 and determine which position appears to provide better value relative to salary.**
 
 # Code for Question 3
 ```{r}
@@ -119,7 +120,7 @@ position_value("C")
 
 ## Question 4
 
-While the tables from Question 3 are useful, a visualization can make value comparisons across positions much clearer. Using the combined dataset from Question 1, create a nicely formatted ggplot that compares WS/48 and Salary across positions. Your graph should:
+**4. While the tables from Question 3 are useful, a visualization can make value comparisons across positions much clearer. Using the combined dataset from Question 1, create a nicely formatted ggplot that compares WS/48 and Salary across positions. Your graph should: **
 
 - Display all positions with more than 10 players (from Question 2)
 - Make it visually clear which positions tend to produce more win shares per dollar spent
