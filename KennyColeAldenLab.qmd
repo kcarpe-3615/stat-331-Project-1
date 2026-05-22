@@ -76,3 +76,40 @@ nba_combined |>
 ```
 
 ## Question 3
+Write a function that takes in a position and returns a summary table for players in that position. The table should include each player’s name, salary, WS/48, VORP, games missed, and a new variable called salary_per_WS48, calculated as salary divided by WS/48. Use the function to compare two different positions from Question 2 and determine which position appears to provide better value relative to salary.
+# Code for Question 3
+
+```{r}
+position_value <- function(pos_name) {
+  nba_combined |>
+    filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
+    mutate(
+      salary_per_WS48 = Salary.x / `WS/48`
+    ) |>
+    select(
+      `Player Name`,
+      Position,
+      Salary.x,
+      `WS/48`,
+      VORP,
+      `Games Missed`,
+      salary_per_WS48
+    ) |>
+    arrange(salary_per_WS48) |>
+    kable(
+      col.names = c(
+        "Player",
+        "Position",
+        "Salary",
+        "WS/48",
+        "VORP",
+        "Games Missed",
+        "Salary per WS/48"
+      ),
+      digits = 2
+    )
+}
+
+position_value("PG")
+position_value("C")
+```{r}
