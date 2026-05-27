@@ -1,8 +1,10 @@
 ---
 title: "Project Checkpoint 3"
 author: "Kenny, Cole, Alden"
-format: html
-editor: source
+format:
+   html: 
+      embed-resouces: true
+editor: visual
 ---
 
 ## The Data
