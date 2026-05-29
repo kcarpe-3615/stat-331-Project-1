@@ -1,5 +1,5 @@
 ---
-title: "Project Checkpoint 3"
+title: "Project Checkpoint 4"
 author: "Kenny, Cole, Alden"
 format: 
   html:
@@ -37,9 +37,9 @@ These datasets are collectively useful to analyze player productivity, salary tr
 # Load in Necessary Packages
 library(tidyverse)
 library(knitr)
-```
+library(broom)
+library(kableExtra)
 
-```{r}
 # Read in the Datasets
 nba_data <- read_csv("nba_data.csv")
 nba_salary <- read_csv("nba_salaries.csv")
@@ -50,6 +50,7 @@ nba_salary <- read_csv("nba_salaries.csv")
 **1. Join the 2023 NBA salary dataset with the "nba_data" dataset. Keep only the player name, position, and salary columns from the NBA salary data set to avoid advanced statistics redundancy. Keep only players who appear in both datasets and ensure the data only comes from the 2023 season.**
 
 ```{r}
+#| label: Q1-Data-Join
 # Code for Question 1
 nba_combined <- nba_salary |>
   select(`Player Name`, Position, Salary) |>
@@ -71,11 +72,13 @@ Now that we have the combined dataset, we would like to analyze high performing 
 
 **Only include positions with more than 10 players, and order the rows from highest to lowest median Win Shares.**
 
-:::callout-tip
-
+::: {.callout-tip}
+Use KableExtra or gt styling in order to improve the appearance of your tables.
 :::
 
 ```{r}
+#| label: Q2-Median-Table
+
 nba_combined |>
   mutate(tot_median = median(Salary.x, na.rm = T)) |> 
   group_by(Position) |>
@@ -85,7 +88,13 @@ nba_combined |>
             players = n()) |>
   filter(players > 10) |> 
   arrange(desc(`median_WS/48`)) |>
-  kable()
+  kable(col.names = c("Position", "Median WS/48",
+                      "Median Salary", "Positional Salary Difference",
+                      "Number of Players"), 
+        caption = "Median NBA Salary Table by Position") |> 
+  kable_styling(full_width = F,
+                bootstrap_options = "striped") |> 
+  row_spec(row = 0, bold = T, align = "c")
 ```
 
 ## Question 3
@@ -94,46 +103,37 @@ In Question 2, we compared positions using median salary and median WS/48 separa
 
 **3. Write a function that takes in a position and returns a summary table for players in that position. The table should include each player’s name, salary, WS/48, VORP, games missed, and a new variable called salary_per_WS48, calculated as salary divided by WS/48. Use the function to compare two different positions from Question 2 and determine which position appears to provide better value relative to salary.**
 
-# Code for Question 3
+::: {.callout-tip}
+To avoid outputting the entire list, insert another argument function to only output the first 5 NBA players.
+:::
+
 ```{r}
-position_value <- function(pos_name) {
+#| label: Q3-Position-Function
+
+position_value <- function(pos_name, n_players) {
   nba_combined |>
     filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
-    mutate(
-      salary_per_WS48 = Salary.x / `WS/48`
-    ) |>
-    select(
-      `Player Name`,
-      Position,
-      Salary.x,
-      `WS/48`,
-      VORP,
-      `Games Missed`,
-      salary_per_WS48
-    ) |>
+    mutate(salary_per_WS48 = Salary.x / `WS/48`) |>
+    select(`Player Name`, Position,
+           Salary.x, `WS/48`,
+           VORP, `Games Missed`,
+           salary_per_WS48) |>
     arrange(salary_per_WS48) |>
-    kable(
-      col.names = c(
-        "Player",
-        "Position",
-        "Salary",
-        "WS/48",
-        "VORP",
-        "Games Missed",
-        "Salary per WS/48"
-      ),
-      digits = 2
-    )
+    slice_head(n = n_players) |>
+    kable(col.names = c("Player", "Position",
+                        "Salary", "WS/48",
+                        "VORP", "Games Missed",
+                        "Salary per WS/48"),
+      digits = 2)
 }
 
-position_value("PG")
-position_value("C")
+position_value("PG", 5)
+position_value("C", 5)
 ```
-
 
 ## Question 4
 
-**4. While the tables from Question 3 are useful, a visualization can make value comparisons across positions much clearer. Using the combined dataset from Question 1, create a nicely formatted ggplot that compares WS/48 and Salary across positions. Your graph should: **
+**4. While the tables from Question 3 are useful, a visualization can make value comparisons across positions much clearer. Using the combined dataset from Question 1, create a nicely formatted scatterplot that compares WS/48 and Salary across positions. Your graph should: **
 
 - Display all positions with more than 10 players (from Question 2)
 - Make it visually clear which positions tend to produce more win shares per dollar spent
@@ -142,9 +142,7 @@ position_value("C")
 
 
 ```{r}
-#| label: q4-value-plot
-#| fig-width: 9
-#| fig-height: 6
+#| label: Q4-Salary-Visualization
 
 nba_combined |>
   group_by(Position) |>
@@ -179,8 +177,12 @@ While much of NBA analysis focuses on performance and salary, player availabilit
 
 **5. Create a new variable called `injury_category` that classifies each player's injury as `"Knee"`, `"Ankle"`, `"Back"`, `"Hamstring"`, `"Other"`, or `"None"` based on keywords found in the `Injury` text. Then, create a nicely formatted table summarizing the number of players and the median number of games missed for each injury category, ordered from most to fewest median games missed. Which type of injury appears to be the most costly in terms of player availability?**
 
+::: {.callout-tip}
+Use `str_to_lower()` before searching injury text so that words like "Knee", "knee", and "KNEE" are treated the same.
+:::
+
 ````{r}
-#| label: q5-injury-categories
+#| label: Q5-Injury-Categories
 
 nba_combined |>
   mutate(
@@ -203,12 +205,13 @@ nba_combined |>
   kable(
     col.names = c("Injury Category", "Number of Players", "Median Games Missed"),
     caption = "Player Availability by Injury Type (2023 Season)"
-  )
+  ) |> 
+  kable_styling(full_width = F,
+                bootstrap_options = "striped") |> 
+  row_spec(row = 0, bold = T, align = "c")
 ````
 
 Based on the table, knee injuries appear to be the most costly in terms of player availability — players with knee injuries miss substantially more games on average than players with injuries to other body parts. This makes intuitive sense given that serious knee injuries (such as ACL or meniscus tears) often require surgery and lengthy rehabilitation, whereas ankle and hamstring injuries tend to heal more quickly. Teams may want to weigh injury history, especially knee-related injuries more heavily when evaluating player contracts.
-
-
 
 ## Question 6
 
@@ -216,23 +219,22 @@ So far, we've used the `position_value()` function from Question 3 to look at on
 
 **6. Using iteration, apply a player-level value function to every position with more than 10 players (from Question 2). Combine the results into a single data frame, then display the 10 players league-wide with the lowest `salary_per_WS48` in a nicely formatted table. Which players represent the best contract value in the league?**
 
+::: {.callout-tip}
+Create a function that returns a data frame, not a `kable()` table. This makes it easier to combine results across positions using `map_dfr()`.
+:::
+
 ```{r}
-#| label: q6-best-value-league
+#| label: Q6-Best-Value-Function
 
 #Modified version
 position_value_df <- function(pos_name) {
   nba_combined |>
     filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
     mutate(salary_per_WS48 = Salary.x / `WS/48`) |>
-    select(
-      `Player Name`,
-      Position,
-      Salary.x,
-      `WS/48`,
-      VORP,
-      `Games Missed`,
-      salary_per_WS48
-    )
+    select(`Player Name`, Position,
+           Salary.x, `WS/48`,
+           VORP, `Games Missed`,
+           salary_per_WS48)
 }
 
 #Find positions with more than 10 players
@@ -249,97 +251,73 @@ all_positions_value |>
   arrange(salary_per_WS48) |>
   slice_head(n = 10) |>
   kable(
-    col.names = c(
-      "Player",
-      "Position",
-      "Salary",
-      "WS/48",
-      "VORP",
-      "Games Missed",
-      "Salary per WS/48"
-    ),
+    col.names = c("Player", "Position",
+                  "Salary", "WS/48",
+                  "VORP", "Games Missed",
+                  "Salary per WS/48"),
     digits = 2,
-    caption = "Top 10 Best Contract Values in the NBA (2023 Season)"
-  )
+    caption = "Top 10 Best Contract Values in the NBA (2023 Season)")
 ```
 
 The resulting table reveals the players providing the most win-share production per dollar of salary across the entire league. Many of these players tend to be on rookie-scale or minimum contracts, since their salaries are capped by collective bargaining rules even when their on-court production is strong. This pattern is consistent with the position-level findings from Questions 3 and 4 — younger, less expensive players (often point guards still on their rookie deals) frequently top the value rankings, while veterans on max contracts rarely appear, even when their production is excellent.
 
 ## Question 7
 
-Summary statistics like the median WS/48 we calculated in Question 2 are useful, but they only give us a single number — they don't tell us how *stable* that estimate is. If we had sampled a slightly different set of point guards, would the median look noticeably different? Bootstrap resampling helps us answer this by repeatedly drawing samples (with replacement) from our data, recalculating the statistic each time, and examining the distribution of those resampled values. This gives us a sense of the uncertainty around our estimate and lets us build a confidence interval for the true median.
-
-**7. Use bootstrap resampling to estimate the uncertainty around the median WS/48 for point guards. Draw 1,000 bootstrap resamples (with replacement) from the point guard WS/48 values, compute the median of each resample, and create a nicely formatted histogram of the bootstrap distribution. Add vertical lines showing the 95% confidence interval (the 2.5th and 97.5th percentiles) and the overall league-wide median WS/48 from Question 2. Does the league-wide median fall inside the point guard confidence interval, and what does that suggest about how point guards compare to the rest of the league?**
+**7a. Salary is often influenced by player performance, but it is not always clear which statistics matter most. Using the combined 2023 dataset, fit a linear regression model predicting salary using WS/48, VORP, and Games Missed as explanatory variables. Display the model summary comment on which variable appears to have the strongest relationship with salary?**
 
 ```{r}
-#| label: q7-bootstrap-pg-median
-#| fig-width: 9
-#| fig-height: 6
+#| label: Q7a-Model
 
-# Set a seed for reproducibility
-set.seed(123)
+salary_model <- lm(Salary.x ~ `WS/48` + VORP + `Games Missed`,
+                   data = nba_combined)
 
-# Pull out point guard WS/48 values
-pg_ws48 <- nba_combined |>
-  filter(Position == "PG", !is.na(`WS/48`)) |>
-  pull(`WS/48`)
-
-# Bootstrap: 1,000 resamples, computing the median of each
-boot_medians <- map_dbl(
-  1:1000,
-  ~ median(sample(pg_ws48, size = length(pg_ws48), replace = TRUE))
-)
-
-# 95% confidence interval from the bootstrap distribution
-boot_ci <- quantile(boot_medians, probs = c(0.025, 0.975))
-
-# League-wide median WS/48 (matches Question 2)
-nba_median_ws48 <- median(nba_combined$`WS/48`, na.rm = TRUE)
-
-# Plot the bootstrap distribution
-tibble(boot_median = boot_medians) |>
-  ggplot(aes(x = boot_median)) +
-  geom_histogram(
-    bins = 30,
-    fill = "steelblue",
-    color = "white",
-    alpha = 0.85
-  ) +
-  geom_vline(
-    xintercept = boot_ci,
-    color = "darkorange",
-    linetype = "dashed",
-    linewidth = 1
-  ) +
-  geom_vline(
-    xintercept = nba_median_ws48,
-    color = "firebrick",
-    linetype = "solid",
-    linewidth = 1
-  ) +
-  labs(
-    title = "Bootstrap Distribution of Median WS/48 for Point Guards",
-    subtitle = "Dashed orange lines show the 95% confidence interval; solid red line shows the league-wide median",
-    x = "Bootstrapped Median WS/48",
-    y = "Frequency",
-    caption = "Source: Kaggle NBA datasets (2020–2023) | 1,000 bootstrap resamples"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14),
-    plot.subtitle = element_text(color = "gray40", size = 10)
-  )
-
-# Print the numerical results
-boot_ci
-nba_median_ws48
+summary(salary_model)
 ```
 
-The 95% confidence interval shows the range of plausible values for the true median point guard WS/48, given our sample data. If the overall league-wide median falls *outside* the point guard confidence interval, it suggests point guards have a meaningfully different typical WS/48 than the rest of the league, supporting the conclusion from Question 2 that point guards have a higher-than-average median WS/48. If the league-wide median falls *inside* the interval, point guards' median isn't statistically different from the league as a whole at this sample size, and the differences we observed in Question 2 may not be as conclusive as the table suggested. The bootstrap distribution gives us a visualization of the data which is more helpful than a single median value.
+Based on the model results, VORP appears to have the strongest relationship with salary because it increases as salary increases and has a statistically significant p-value. WS/48 and Games Missed may also help explain salary, but they are less complete measures on their own. 
 
-## Question 8: Using the combined 2023 dataset, classify each player as "Low Salary", "Middle Salary", or "High Salary" based on salary percentiles. Then, summarize the median WS/48, median VORP, median salary, and number of players in each salary category. Which salary group appears to provide the best overall performance value?
+**7b. Conduct model diagnostics to check that the conditions for linear regression that we discussed in class are met (L.I.N.E.). Comment on whether the `salary_model` meets the appropriate L.I.N.E conditions. **
+
+::: {.callout-tip}
+You may need multiple plots or output to check all diagnostics. You should be using techniques that we learned in class - not base R functions.
+:::
+
 ```{r}
-#| label: q7-salary-categories
+#| label: Q7b-Model-Diagnostics
+
+salary_model |> 
+  augment() |> 
+  ggplot(aes(x = .fitted, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype = "dashed", 
+             color = "red", lwd = 1.5) +
+  labs(title = "Residuals vs. Fitted Values",
+       x = "Fitted Salary",
+       y = "Residuals")
+
+broom::glance(salary_model) |> 
+  kable()
+
+resid_sd <- sd(salary_model$residuals)
+  
+salary_model |> 
+  broom::augment() |> 
+  ggplot(aes(x = .resid)) +
+  geom_histogram(aes(y = ..density..)) +
+  stat_function(fun = ~ dnorm(.x, mean = 0, sd = resid_sd),
+                color = "steelblue", lwd = 1.5) +
+  xlab("Residuals") +
+  theme(aspect.ratio = 1)
+
+```
+The diagnostic plots suggest that the model is useful for identifying general relationships, but salary data is likely skewed because a small number of star players earn much more than the rest of the league due to max contracts. This may create some unequal variance and influential observations, so the model assumptions may not be met. In addition, the residula plot seems to have a decreasing spread of residuals as fitted salary increases.
+
+## Question 8
+
+**Question 8: Using the combined 2023 dataset, classify each player as "Low Salary", "Middle Salary", or "High Salary" based on salary percentiles. Then, summarize the median WS/48, median VORP, median salary, and number of players in each salary category. Which salary group appears to provide the best overall performance value?**
+
+```{r}
+#| label: Q8-Salary-Categories
 
 salary_summary <- nba_combined |>
   filter(!is.na(Salary.x), !is.na(`WS/48`), !is.na(VORP)) |>
@@ -362,27 +340,24 @@ salary_summary <- nba_combined |>
 
 salary_summary |>
   kable(
-    col.names = c(
-      "Salary Category",
-      "Number of Players",
-      "Median Salary",
-      "Median WS/48",
-      "Median VORP"
-    ),
+    col.names = c("Salary Category", "Number of Players",
+                  "Median Salary",
+                  "Median WS/48", "Median VORP"),
     digits = 2,
-    caption = "Performance Summary by Salary Category"
-  )
+    caption = "Performance Summary by Salary Category") |> 
+  kable_styling(full_width = F,
+                bootstrap_options = "striped") |> 
+  row_spec(row = 0, bold = T, align = "c")
 ```
 
+Based on the summary table, the best overall performance value seems to be the high salary players which makes intuitive sense because players get payed more for good performance.
 
+## Question 9
 
-
-## Question 9: Simulate 1,000 random samples of 25 players from the 2023 combined dataset. For each sample, calculate the mean salary. Then, create a histogram of the simulated mean salaries. How does the average simulated sample salary compare to the true mean salary of all players in the dataset?
+**Question 9: Simulate 1,000 random samples of 25 players from the 2023 combined dataset. For each sample, calculate the mean salary. Then, create a histogram of the simulated mean salaries. How does the average simulated sample salary compare to the true mean salary of all players in the dataset?**
 
 ```{r}
-#| label: q9-salary-simulation
-#| fig-width: 8
-#| fig-height: 5
+#| label: Q9-Salary-Simulation
 
 set.seed(331)
 
@@ -437,23 +412,32 @@ salary_simulation |>
     ),
     digits = 2,
     caption = "Comparison of Simulated and True Mean Salary"
-  )
+  ) |> 
+  kable_styling(full_width = F,
+                bootstrap_options = "striped") |> 
+  row_spec(row = 0, bold = T, align = "c")
 ```
+The average simulated sample salary is close to the true mean salary of all players in the dataset. Because each sample is randomly drawn from the same population of players, the sampling distribution should center around the true mean.
 
+## Question 10
 
-## Question 10: Using the combined 2023 dataset, create a new variable called performance_tier that classifies players as "Low", "Average", or "High" performers based on their VORP values. Then, create a faceted ggplot showing the relationship between Salary and WS/48 for each performance tier. What does the visualization suggest about whether higher-paid players are always more efficient?
+**Question 10: Using the combined 2023 dataset, create a new variable called performance_tier that classifies players as "Low", "Average", or "High" performers based on their VORP values. Then, create a faceted ggplot showing the relationship between Salary and WS/48 for each performance tier. What does the visualization suggest about whether higher-paid players are always more efficient?**
+
+::: {.callout-tip}
+Use the qnorm() function in R to classify players performance based on VORP values. 
+:::
 
 ```{r}
-#| label: q8-performance-tier-plot
-#| fig-width: 9
-#| fig-height: 6
+#| label: Q10-Performance-Tier
 
 nba_combined_tiers <- nba_combined |>
   filter(!is.na(VORP), !is.na(`WS/48`), !is.na(Salary.x)) |>
   mutate(
+    z_vorp = (VORP - mean(VORP, na.rm = TRUE)) /
+             sd(VORP, na.rm = TRUE),
     performance_tier = case_when(
-      VORP <= quantile(VORP, 0.33, na.rm = TRUE) ~ "Low",
-      VORP <= quantile(VORP, 0.67, na.rm = TRUE) ~ "Average",
+      z_vorp < qnorm(0.33) ~ "Low",
+      z_vorp < qnorm(0.67) ~ "Average",
       TRUE ~ "High"
     )
   )
@@ -466,10 +450,11 @@ nba_combined_tiers |>
   scale_y_continuous(labels = scales::label_dollar(suffix = "M")) +
   labs(
     title = "Salary and Efficiency by Performance Tier",
-    subtitle = "Players are grouped by VORP percentiles",
+    subtitle = "Players are grouped using standardized VORP values",
     x = "Win Shares per 48 Minutes (WS/48)",
     y = "Salary in Millions",
     caption = "Source: Kaggle NBA datasets, 2023 season"
   ) +
   theme_minimal()
 ```
+The visualization suggests that higher-paid players are not always more efficient. While high performance players may generally earn more, there are still players with relatively low salaries who have strong WS/48 values. This shows that salary is related to performance, but it does not perfectly measure efficiency. Some lower-paid players provide strong value, while some higher-paid players do not produce proportionally higher win-share efficiency. This may be due partly becuase of rookie-scale contracts where players in their first few years in the NBA are obligated to a small contract. 
