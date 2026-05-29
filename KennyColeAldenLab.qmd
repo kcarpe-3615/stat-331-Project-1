@@ -206,11 +206,136 @@ nba_combined |>
   )
 ````
 
-Based on the table, knee injuries appear to be the most costly in terms of player availability — players with knee injuries miss substantially more games on average than players with injuries to other body parts. This makes intuitive sense given that serious knee injuries (such as ACL or meniscus tears) often require surgery and lengthy rehabilitation, whereas ankle and hamstring injuries tend to heal more quickly. Teams may want to weigh injury history — especially knee-related injuries — more heavily when evaluating player contracts.
+Based on the table, knee injuries appear to be the most costly in terms of player availability — players with knee injuries miss substantially more games on average than players with injuries to other body parts. This makes intuitive sense given that serious knee injuries (such as ACL or meniscus tears) often require surgery and lengthy rehabilitation, whereas ankle and hamstring injuries tend to heal more quickly. Teams may want to weigh injury history, especially knee-related injuries more heavily when evaluating player contracts.
 
 
 
+## Question 6
 
+So far, we've used the `position_value()` function from Question 3 to look at one position at a time. To find the most valuable contracts across the entire league, we'd need to apply the function to every qualifying position and combine the results into a single ranking. Rather than calling the function manually for each position, we can use iteration with `map_dfr()` from the `purrr` package (part of the tidyverse) to apply the function to all positions at once and stack the resulting tables together.
+
+**6. Using iteration, apply a player-level value function to every position with more than 10 players (from Question 2). Combine the results into a single data frame, then display the 10 players league-wide with the lowest `salary_per_WS48` in a nicely formatted table. Which players represent the best contract value in the league?**
+
+```{r}
+#| label: q6-best-value-league
+
+#Modified version
+position_value_df <- function(pos_name) {
+  nba_combined |>
+    filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
+    mutate(salary_per_WS48 = Salary.x / `WS/48`) |>
+    select(
+      `Player Name`,
+      Position,
+      Salary.x,
+      `WS/48`,
+      VORP,
+      `Games Missed`,
+      salary_per_WS48
+    )
+}
+
+#Find positions with more than 10 players
+positions_to_check <- nba_combined |>
+  count(Position) |>
+  filter(n > 10) |>
+  pull(Position)
+
+#Iterate the function over every qualifying position, stacking results
+all_positions_value <- map_dfr(positions_to_check, position_value_df)
+
+#Display the top 10 best-value players in the dataset
+all_positions_value |>
+  arrange(salary_per_WS48) |>
+  slice_head(n = 10) |>
+  kable(
+    col.names = c(
+      "Player",
+      "Position",
+      "Salary",
+      "WS/48",
+      "VORP",
+      "Games Missed",
+      "Salary per WS/48"
+    ),
+    digits = 2,
+    caption = "Top 10 Best Contract Values in the NBA (2023 Season)"
+  )
+```
+
+The resulting table reveals the players providing the most win-share production per dollar of salary across the entire league. Many of these players tend to be on rookie-scale or minimum contracts, since their salaries are capped by collective bargaining rules even when their on-court production is strong. This pattern is consistent with the position-level findings from Questions 3 and 4 — younger, less expensive players (often point guards still on their rookie deals) frequently top the value rankings, while veterans on max contracts rarely appear, even when their production is excellent.
+
+## Question 7
+
+Summary statistics like the median WS/48 we calculated in Question 2 are useful, but they only give us a single number — they don't tell us how *stable* that estimate is. If we had sampled a slightly different set of point guards, would the median look noticeably different? Bootstrap resampling helps us answer this by repeatedly drawing samples (with replacement) from our data, recalculating the statistic each time, and examining the distribution of those resampled values. This gives us a sense of the uncertainty around our estimate and lets us build a confidence interval for the true median.
+
+**7. Use bootstrap resampling to estimate the uncertainty around the median WS/48 for point guards. Draw 1,000 bootstrap resamples (with replacement) from the point guard WS/48 values, compute the median of each resample, and create a nicely formatted histogram of the bootstrap distribution. Add vertical lines showing the 95% confidence interval (the 2.5th and 97.5th percentiles) and the overall league-wide median WS/48 from Question 2. Does the league-wide median fall inside the point guard confidence interval, and what does that suggest about how point guards compare to the rest of the league?**
+
+```{r}
+#| label: q7-bootstrap-pg-median
+#| fig-width: 9
+#| fig-height: 6
+
+# Set a seed for reproducibility
+set.seed(123)
+
+# Pull out point guard WS/48 values
+pg_ws48 <- nba_combined |>
+  filter(Position == "PG", !is.na(`WS/48`)) |>
+  pull(`WS/48`)
+
+# Bootstrap: 1,000 resamples, computing the median of each
+boot_medians <- map_dbl(
+  1:1000,
+  ~ median(sample(pg_ws48, size = length(pg_ws48), replace = TRUE))
+)
+
+# 95% confidence interval from the bootstrap distribution
+boot_ci <- quantile(boot_medians, probs = c(0.025, 0.975))
+
+# League-wide median WS/48 (matches Question 2)
+nba_median_ws48 <- median(nba_combined$`WS/48`, na.rm = TRUE)
+
+# Plot the bootstrap distribution
+tibble(boot_median = boot_medians) |>
+  ggplot(aes(x = boot_median)) +
+  geom_histogram(
+    bins = 30,
+    fill = "steelblue",
+    color = "white",
+    alpha = 0.85
+  ) +
+  geom_vline(
+    xintercept = boot_ci,
+    color = "darkorange",
+    linetype = "dashed",
+    linewidth = 1
+  ) +
+  geom_vline(
+    xintercept = nba_median_ws48,
+    color = "firebrick",
+    linetype = "solid",
+    linewidth = 1
+  ) +
+  labs(
+    title = "Bootstrap Distribution of Median WS/48 for Point Guards",
+    subtitle = "Dashed orange lines show the 95% confidence interval; solid red line shows the league-wide median",
+    x = "Bootstrapped Median WS/48",
+    y = "Frequency",
+    caption = "Source: Kaggle NBA datasets (2020–2023) | 1,000 bootstrap resamples"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(color = "gray40", size = 10)
+  )
+
+# Print the numerical results
+boot_ci
+nba_median_ws48
+```
+
+The 95% confidence interval shows the range of plausible values for the true median point guard WS/48, given our sample data. If the overall league-wide median falls *outside* the point guard confidence interval, it suggests point guards have a meaningfully different typical WS/48 than the rest of the league, supporting the conclusion from Question 2 that point guards have a higher-than-average median WS/48. If the league-wide median falls *inside* the interval, point guards' median isn't statistically different from the league as a whole at this sample size, and the differences we observed in Question 2 may not be as conclusive as the table suggested. The bootstrap distribution gives us a visualization of the data which is more helpful than a single median value.
 
 
 
