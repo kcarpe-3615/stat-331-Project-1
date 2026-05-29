@@ -337,8 +337,139 @@ nba_median_ws48
 
 The 95% confidence interval shows the range of plausible values for the true median point guard WS/48, given our sample data. If the overall league-wide median falls *outside* the point guard confidence interval, it suggests point guards have a meaningfully different typical WS/48 than the rest of the league, supporting the conclusion from Question 2 that point guards have a higher-than-average median WS/48. If the league-wide median falls *inside* the interval, point guards' median isn't statistically different from the league as a whole at this sample size, and the differences we observed in Question 2 may not be as conclusive as the table suggested. The bootstrap distribution gives us a visualization of the data which is more helpful than a single median value.
 
+## Question 8: Using the combined 2023 dataset, classify each player as "Low Salary", "Middle Salary", or "High Salary" based on salary percentiles. Then, summarize the median WS/48, median VORP, median salary, and number of players in each salary category. Which salary group appears to provide the best overall performance value?
+```{r}
+#| label: q7-salary-categories
+
+salary_summary <- nba_combined |>
+  filter(!is.na(Salary.x), !is.na(`WS/48`), !is.na(VORP)) |>
+  mutate(
+    salary_category = case_when(
+      Salary.x <= quantile(Salary.x, 0.33, na.rm = TRUE) ~ "Low Salary",
+      Salary.x <= quantile(Salary.x, 0.67, na.rm = TRUE) ~ "Middle Salary",
+      TRUE ~ "High Salary"
+    )
+  ) |>
+  group_by(salary_category) |>
+  summarize(
+    players = n(),
+    median_salary = median(Salary.x, na.rm = TRUE),
+    median_WS48 = median(`WS/48`, na.rm = TRUE),
+    median_VORP = median(VORP, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  arrange(desc(median_WS48))
+
+salary_summary |>
+  kable(
+    col.names = c(
+      "Salary Category",
+      "Number of Players",
+      "Median Salary",
+      "Median WS/48",
+      "Median VORP"
+    ),
+    digits = 2,
+    caption = "Performance Summary by Salary Category"
+  )
+```
 
 
 
 
+## Question 9: Simulate 1,000 random samples of 25 players from the 2023 combined dataset. For each sample, calculate the mean salary. Then, create a histogram of the simulated mean salaries. How does the average simulated sample salary compare to the true mean salary of all players in the dataset?
 
+```{r}
+#| label: q9-salary-simulation
+#| fig-width: 8
+#| fig-height: 5
+
+set.seed(331)
+
+sample_mean_salary <- function(sample_size = 25) {
+  nba_combined |>
+    filter(!is.na(Salary.x)) |>
+    slice_sample(n = sample_size, replace = TRUE) |>
+    summarize(mean_salary = mean(Salary.x, na.rm = TRUE)) |>
+    pull(mean_salary)
+}
+
+salary_simulation <- tibble(
+  simulation = 1:1000,
+  mean_salary = map_dbl(simulation, ~ sample_mean_salary(sample_size = 25))
+)
+
+true_mean_salary <- nba_combined |>
+  filter(!is.na(Salary.x)) |>
+  summarize(true_mean = mean(Salary.x, na.rm = TRUE)) |>
+  pull(true_mean)
+
+salary_simulation |>
+  ggplot(aes(x = mean_salary / 1e6)) +
+  geom_histogram(bins = 30, color = "white") +
+  geom_vline(
+    xintercept = true_mean_salary / 1e6,
+    linetype = "dashed",
+    linewidth = 1
+  ) +
+  labs(
+    title = "Simulated Mean NBA Salaries",
+    subtitle = "1,000 random samples of 25 players",
+    x = "Mean Salary in Sample, in Millions",
+    y = "Number of Simulations",
+    caption = "Dashed line shows the true mean salary of all players in the 2023 combined dataset"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+salary_simulation |>
+  summarize(
+    average_simulated_mean = mean(mean_salary),
+    true_mean_salary = true_mean_salary,
+    difference = average_simulated_mean - true_mean_salary
+  ) |>
+  kable(
+    col.names = c(
+      "Average Simulated Mean Salary",
+      "True Mean Salary",
+      "Difference"
+    ),
+    digits = 2,
+    caption = "Comparison of Simulated and True Mean Salary"
+  )
+```
+
+
+## Question 10: Using the combined 2023 dataset, create a new variable called performance_tier that classifies players as "Low", "Average", or "High" performers based on their VORP values. Then, create a faceted ggplot showing the relationship between Salary and WS/48 for each performance tier. What does the visualization suggest about whether higher-paid players are always more efficient?
+
+```{r}
+#| label: q8-performance-tier-plot
+#| fig-width: 9
+#| fig-height: 6
+
+nba_combined_tiers <- nba_combined |>
+  filter(!is.na(VORP), !is.na(`WS/48`), !is.na(Salary.x)) |>
+  mutate(
+    performance_tier = case_when(
+      VORP <= quantile(VORP, 0.33, na.rm = TRUE) ~ "Low",
+      VORP <= quantile(VORP, 0.67, na.rm = TRUE) ~ "Average",
+      TRUE ~ "High"
+    )
+  )
+
+nba_combined_tiers |>
+  ggplot(aes(x = `WS/48`, y = Salary.x / 1e6)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  facet_wrap(vars(performance_tier)) +
+  scale_y_continuous(labels = scales::label_dollar(suffix = "M")) +
+  labs(
+    title = "Salary and Efficiency by Performance Tier",
+    subtitle = "Players are grouped by VORP percentiles",
+    x = "Win Shares per 48 Minutes (WS/48)",
+    y = "Salary in Millions",
+    caption = "Source: Kaggle NBA datasets, 2023 season"
+  ) +
+  theme_minimal()
+```
