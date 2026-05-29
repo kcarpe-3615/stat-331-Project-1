@@ -1,15 +1,22 @@
 ---
 title: "Project Checkpoint 3"
 author: "Kenny, Cole, Alden"
-format:
-   html: 
-      embed-resouces: true
-editor: visual
+format: 
+  html:
+    code-tools: true
+    toc: true
+    embed-resources: true
+editor: source
+execute: 
+  error: true
+  echo: true
+  message: false
+  warning: false
 ---
 
 ## The Data
 
-The following link displays the Kaggle source for one of the csvs used in this lab: <https://www.kaggle.com/datasets/ahmedalmadami/2020-2023-nba-data/data>
+The following link displays the Kaggle source for one of the csvs used in this lab: [NBA Data from 2020-2023](https://www.kaggle.com/datasets/ahmedalmadami/2020-2023-nba-data/data)
 
 This dataset contains NBA player performance statistics from the 2020-2023 NBA seasons. Each row shows the stats for a particular player in a particular season between 2020-2023. There are a number of different variables that fall into following categories:
 
@@ -18,7 +25,7 @@ This dataset contains NBA player performance statistics from the 2020-2023 NBA s
 -   Team Context: wins, losses, team, division
 -   A wide array of advanced game performance stats.
 
-The following link displays the Kaggle source for the second csv used in this lab: <https://www.kaggle.com/code/rizal1015/nba-salaries?select=nba_salaries.csv>
+The following link displays the Kaggle source for the second csv used in this lab: [NBA Salary Data 2023](https://www.kaggle.com/code/rizal1015/nba-salaries?select=nba_salaries.csv)
 
 This csv contains information primarily on each individual players NBA salary and player performance statistics during the 2023 season. This data differs from the previous dataset in that player position, salary, and different player performance statistics are being used.
 
@@ -63,6 +70,10 @@ Now that we have the combined dataset, we would like to analyze high performing 
 -   the number of players in each position
 
 **Only include positions with more than 10 players, and order the rows from highest to lowest median Win Shares.**
+
+:::callout-tip
+
+:::
 
 ```{r}
 nba_combined |>
