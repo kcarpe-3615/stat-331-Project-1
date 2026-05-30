@@ -8,7 +8,7 @@
 
 <meta name="author" content="Kenny, Cole, Alden">
 
-<title>Project Checkpoint 3</title>
+<title>Project Checkpoint 4</title>
 <style>
 
 code{white-space: pre-wrap;}
@@ -2451,7 +2451,7 @@ border: 0;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">Project Checkpoint 3</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">Project Checkpoint 4</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
 
@@ -3228,32 +3228,37 @@ Tip
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>salary_summary <span class="ot">&lt;-</span> nba_combined <span class="sc">|&gt;</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Salary.x), <span class="sc">!</span><span class="fu">is.na</span>(<span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>), <span class="sc">!</span><span class="fu">is.na</span>(VORP)) <span class="sc">|&gt;</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">salary_category =</span> <span class="fu">case_when</span>(</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      Salary.x <span class="sc">&lt;=</span> <span class="fu">quantile</span>(Salary.x, <span class="fl">0.33</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">&quot;Low Salary&quot;</span>,</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>      Salary.x <span class="sc">&lt;=</span> <span class="fu">quantile</span>(Salary.x, <span class="fl">0.67</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">&quot;Middle Salary&quot;</span>,</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;High Salary&quot;</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(salary_category) <span class="sc">|&gt;</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">players =</span> <span class="fu">n</span>(),</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_salary =</span> <span class="fu">median</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_WS48 =</span> <span class="fu">median</span>(<span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_VORP =</span> <span class="fu">median</span>(VORP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(median_WS48))</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>salary_summary <span class="sc">|&gt;</span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Salary Category&quot;</span>, <span class="st">&quot;Number of Players&quot;</span>,</span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Median Salary&quot;</span>,</span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Median WS/48&quot;</span>, <span class="st">&quot;Median VORP&quot;</span>),</span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">2</span>,</span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Performance Summary by Salary Category&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> F,</span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>                <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="at">row =</span> <span class="dv">0</span>, <span class="at">bold =</span> T, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">salary_z =</span> (Salary.x <span class="sc">-</span> <span class="fu">mean</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">/</span> <span class="fu">sd</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">salary_category =</span> <span class="fu">case_when</span>(</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>      salary_z <span class="sc">&lt;=</span> <span class="fu">qnorm</span>(<span class="fl">0.33</span>) <span class="sc">~</span> <span class="st">&quot;Low Salary&quot;</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      salary_z <span class="sc">&lt;=</span> <span class="fu">qnorm</span>(<span class="fl">0.67</span>) <span class="sc">~</span> <span class="st">&quot;Middle Salary&quot;</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;High Salary&quot;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(salary_category) <span class="sc">|&gt;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">players =</span> <span class="fu">n</span>(),</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_salary =</span> <span class="fu">median</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_WS48 =</span> <span class="fu">median</span>(<span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_VORP =</span> <span class="fu">median</span>(VORP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(median_WS48))</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>salary_summary <span class="sc">|&gt;</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Salary Category&quot;</span>, <span class="st">&quot;Number of Players&quot;</span>,</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Median Salary&quot;</span>, <span class="st">&quot;Median WS/48&quot;</span>, <span class="st">&quot;Median VORP&quot;</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Performance Summary by Salary Category&quot;</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="at">row =</span> <span class="dv">0</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <table class="table table-striped caption-top table-sm small">
 <caption>Performance Summary by Salary Category</caption>
@@ -3269,22 +3274,22 @@ Tip
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">High Salary</td>
-<td style="text-align: right;">53</td>
-<td style="text-align: right;">31650600</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">33616770</td>
 <td style="text-align: right;">0.13</td>
 <td style="text-align: right;">1.2</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Middle Salary</td>
-<td style="text-align: right;">53</td>
-<td style="text-align: right;">13534817</td>
-<td style="text-align: right;">0.09</td>
-<td style="text-align: right;">0.3</td>
+<td style="text-align: right;">43</td>
+<td style="text-align: right;">16500000</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.4</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Low Salary</td>
-<td style="text-align: right;">54</td>
-<td style="text-align: right;">4340140</td>
+<td style="text-align: right;">70</td>
+<td style="text-align: right;">5549818</td>
 <td style="text-align: right;">0.08</td>
 <td style="text-align: right;">0.0</td>
 </tr>
@@ -3893,7 +3898,7 @@ Tip
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Project Checkpoint 3&quot;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Project Checkpoint 4&quot;</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> &quot;Kenny, Cole, Alden&quot;</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
@@ -4216,142 +4221,147 @@ Tip
 <span id="cb18-340"><a href="#cb18-340" aria-hidden="true" tabindex="-1"></a>salary_summary <span class="ot">&lt;-</span> nba_combined <span class="sc">|&gt;</span></span>
 <span id="cb18-341"><a href="#cb18-341" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Salary.x), <span class="sc">!</span><span class="fu">is.na</span>(<span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>), <span class="sc">!</span><span class="fu">is.na</span>(VORP)) <span class="sc">|&gt;</span></span>
 <span id="cb18-342"><a href="#cb18-342" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb18-343"><a href="#cb18-343" aria-hidden="true" tabindex="-1"></a>    <span class="at">salary_category =</span> <span class="fu">case_when</span>(</span>
-<span id="cb18-344"><a href="#cb18-344" aria-hidden="true" tabindex="-1"></a>      Salary.x <span class="sc">&lt;=</span> <span class="fu">quantile</span>(Salary.x, <span class="fl">0.33</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">&quot;Low Salary&quot;</span>,</span>
-<span id="cb18-345"><a href="#cb18-345" aria-hidden="true" tabindex="-1"></a>      Salary.x <span class="sc">&lt;=</span> <span class="fu">quantile</span>(Salary.x, <span class="fl">0.67</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">~</span> <span class="st">&quot;Middle Salary&quot;</span>,</span>
-<span id="cb18-346"><a href="#cb18-346" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;High Salary&quot;</span></span>
-<span id="cb18-347"><a href="#cb18-347" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb18-348"><a href="#cb18-348" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb18-349"><a href="#cb18-349" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(salary_category) <span class="sc">|&gt;</span></span>
-<span id="cb18-350"><a href="#cb18-350" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb18-351"><a href="#cb18-351" aria-hidden="true" tabindex="-1"></a>    <span class="at">players =</span> <span class="fu">n</span>(),</span>
-<span id="cb18-352"><a href="#cb18-352" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_salary =</span> <span class="fu">median</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb18-353"><a href="#cb18-353" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_WS48 =</span> <span class="fu">median</span>(<span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb18-354"><a href="#cb18-354" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_VORP =</span> <span class="fu">median</span>(VORP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb18-355"><a href="#cb18-355" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb18-356"><a href="#cb18-356" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb18-357"><a href="#cb18-357" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(median_WS48))</span>
-<span id="cb18-358"><a href="#cb18-358" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-359"><a href="#cb18-359" aria-hidden="true" tabindex="-1"></a>salary_summary <span class="sc">|&gt;</span></span>
-<span id="cb18-360"><a href="#cb18-360" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
-<span id="cb18-361"><a href="#cb18-361" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&quot;Salary Category&quot;</span>, <span class="st">&quot;Number of Players&quot;</span>,</span>
-<span id="cb18-362"><a href="#cb18-362" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Median Salary&quot;</span>,</span>
-<span id="cb18-363"><a href="#cb18-363" aria-hidden="true" tabindex="-1"></a>                  <span class="st">&quot;Median WS/48&quot;</span>, <span class="st">&quot;Median VORP&quot;</span>),</span>
-<span id="cb18-364"><a href="#cb18-364" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">2</span>,</span>
-<span id="cb18-365"><a href="#cb18-365" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Performance Summary by Salary Category&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb18-366"><a href="#cb18-366" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> F,</span>
-<span id="cb18-367"><a href="#cb18-367" aria-hidden="true" tabindex="-1"></a>                <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb18-368"><a href="#cb18-368" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="at">row =</span> <span class="dv">0</span>, <span class="at">bold =</span> T, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>)</span>
-<span id="cb18-369"><a href="#cb18-369" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-370"><a href="#cb18-370" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-371"><a href="#cb18-371" aria-hidden="true" tabindex="-1"></a>Based on the summary table, the best overall performance value seems to be the high salary players which makes intuitive sense because players get payed more for good performance.</span>
-<span id="cb18-372"><a href="#cb18-372" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-373"><a href="#cb18-373" aria-hidden="true" tabindex="-1"></a><span class="fu">## Question 9</span></span>
-<span id="cb18-374"><a href="#cb18-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-375"><a href="#cb18-375" aria-hidden="true" tabindex="-1"></a>**Question 9: Simulate 1,000 random samples of 25 players from the 2023 combined dataset. For each sample, calculate the mean salary. Then, create a histogram of the simulated mean salaries. How does the average simulated sample salary compare to the true mean salary of all players in the dataset?**</span>
-<span id="cb18-376"><a href="#cb18-376" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-379"><a href="#cb18-379" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb18-380"><a href="#cb18-380" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: Q9-Salary-Simulation</span></span>
+<span id="cb18-343"><a href="#cb18-343" aria-hidden="true" tabindex="-1"></a>    <span class="at">salary_z =</span> (Salary.x <span class="sc">-</span> <span class="fu">mean</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">/</span> <span class="fu">sd</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-344"><a href="#cb18-344" aria-hidden="true" tabindex="-1"></a>    <span class="at">salary_category =</span> <span class="fu">case_when</span>(</span>
+<span id="cb18-345"><a href="#cb18-345" aria-hidden="true" tabindex="-1"></a>      salary_z <span class="sc">&lt;=</span> <span class="fu">qnorm</span>(<span class="fl">0.33</span>) <span class="sc">~</span> <span class="st">&quot;Low Salary&quot;</span>,</span>
+<span id="cb18-346"><a href="#cb18-346" aria-hidden="true" tabindex="-1"></a>      salary_z <span class="sc">&lt;=</span> <span class="fu">qnorm</span>(<span class="fl">0.67</span>) <span class="sc">~</span> <span class="st">&quot;Middle Salary&quot;</span>,</span>
+<span id="cb18-347"><a href="#cb18-347" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;High Salary&quot;</span></span>
+<span id="cb18-348"><a href="#cb18-348" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-349"><a href="#cb18-349" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb18-350"><a href="#cb18-350" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(salary_category) <span class="sc">|&gt;</span></span>
+<span id="cb18-351"><a href="#cb18-351" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb18-352"><a href="#cb18-352" aria-hidden="true" tabindex="-1"></a>    <span class="at">players =</span> <span class="fu">n</span>(),</span>
+<span id="cb18-353"><a href="#cb18-353" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_salary =</span> <span class="fu">median</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-354"><a href="#cb18-354" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_WS48 =</span> <span class="fu">median</span>(<span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-355"><a href="#cb18-355" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_VORP =</span> <span class="fu">median</span>(VORP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-356"><a href="#cb18-356" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb18-357"><a href="#cb18-357" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb18-358"><a href="#cb18-358" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(median_WS48))</span>
+<span id="cb18-359"><a href="#cb18-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-360"><a href="#cb18-360" aria-hidden="true" tabindex="-1"></a>salary_summary <span class="sc">|&gt;</span></span>
+<span id="cb18-361"><a href="#cb18-361" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
+<span id="cb18-362"><a href="#cb18-362" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(</span>
+<span id="cb18-363"><a href="#cb18-363" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Salary Category&quot;</span>, <span class="st">&quot;Number of Players&quot;</span>,</span>
+<span id="cb18-364"><a href="#cb18-364" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Median Salary&quot;</span>, <span class="st">&quot;Median WS/48&quot;</span>, <span class="st">&quot;Median VORP&quot;</span></span>
+<span id="cb18-365"><a href="#cb18-365" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb18-366"><a href="#cb18-366" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb18-367"><a href="#cb18-367" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Performance Summary by Salary Category&quot;</span></span>
+<span id="cb18-368"><a href="#cb18-368" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb18-369"><a href="#cb18-369" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
+<span id="cb18-370"><a href="#cb18-370" aria-hidden="true" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb18-371"><a href="#cb18-371" aria-hidden="true" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span></span>
+<span id="cb18-372"><a href="#cb18-372" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb18-373"><a href="#cb18-373" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="at">row =</span> <span class="dv">0</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>)</span>
+<span id="cb18-374"><a href="#cb18-374" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-375"><a href="#cb18-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-376"><a href="#cb18-376" aria-hidden="true" tabindex="-1"></a>Based on the summary table, the best overall performance value seems to be the high salary players which makes intuitive sense because players get payed more for good performance.</span>
+<span id="cb18-377"><a href="#cb18-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-378"><a href="#cb18-378" aria-hidden="true" tabindex="-1"></a><span class="fu">## Question 9</span></span>
+<span id="cb18-379"><a href="#cb18-379" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-380"><a href="#cb18-380" aria-hidden="true" tabindex="-1"></a>**Question 9: Simulate 1,000 random samples of 25 players from the 2023 combined dataset. For each sample, calculate the mean salary. Then, create a histogram of the simulated mean salaries. How does the average simulated sample salary compare to the true mean salary of all players in the dataset?**</span>
 <span id="cb18-381"><a href="#cb18-381" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-382"><a href="#cb18-382" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">331</span>)</span>
-<span id="cb18-383"><a href="#cb18-383" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-384"><a href="#cb18-384" aria-hidden="true" tabindex="-1"></a>sample_mean_salary <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">sample_size =</span> <span class="dv">25</span>) {</span>
-<span id="cb18-385"><a href="#cb18-385" aria-hidden="true" tabindex="-1"></a>  nba_combined <span class="sc">|&gt;</span></span>
-<span id="cb18-386"><a href="#cb18-386" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Salary.x)) <span class="sc">|&gt;</span></span>
-<span id="cb18-387"><a href="#cb18-387" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_sample</span>(<span class="at">n =</span> sample_size, <span class="at">replace =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb18-388"><a href="#cb18-388" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">mean_salary =</span> <span class="fu">mean</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb18-389"><a href="#cb18-389" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(mean_salary)</span>
-<span id="cb18-390"><a href="#cb18-390" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb18-391"><a href="#cb18-391" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-392"><a href="#cb18-392" aria-hidden="true" tabindex="-1"></a>salary_simulation <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb18-393"><a href="#cb18-393" aria-hidden="true" tabindex="-1"></a>  <span class="at">simulation =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>,</span>
-<span id="cb18-394"><a href="#cb18-394" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean_salary =</span> <span class="fu">map_dbl</span>(simulation, <span class="sc">~</span> <span class="fu">sample_mean_salary</span>(<span class="at">sample_size =</span> <span class="dv">25</span>))</span>
-<span id="cb18-395"><a href="#cb18-395" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-384"><a href="#cb18-384" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-385"><a href="#cb18-385" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: Q9-Salary-Simulation</span></span>
+<span id="cb18-386"><a href="#cb18-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-387"><a href="#cb18-387" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">331</span>)</span>
+<span id="cb18-388"><a href="#cb18-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-389"><a href="#cb18-389" aria-hidden="true" tabindex="-1"></a>sample_mean_salary <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">sample_size =</span> <span class="dv">25</span>) {</span>
+<span id="cb18-390"><a href="#cb18-390" aria-hidden="true" tabindex="-1"></a>  nba_combined <span class="sc">|&gt;</span></span>
+<span id="cb18-391"><a href="#cb18-391" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Salary.x)) <span class="sc">|&gt;</span></span>
+<span id="cb18-392"><a href="#cb18-392" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_sample</span>(<span class="at">n =</span> sample_size, <span class="at">replace =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-393"><a href="#cb18-393" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">mean_salary =</span> <span class="fu">mean</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb18-394"><a href="#cb18-394" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(mean_salary)</span>
+<span id="cb18-395"><a href="#cb18-395" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb18-396"><a href="#cb18-396" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-397"><a href="#cb18-397" aria-hidden="true" tabindex="-1"></a>true_mean_salary <span class="ot">&lt;-</span> nba_combined <span class="sc">|&gt;</span></span>
-<span id="cb18-398"><a href="#cb18-398" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Salary.x)) <span class="sc">|&gt;</span></span>
-<span id="cb18-399"><a href="#cb18-399" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">true_mean =</span> <span class="fu">mean</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb18-400"><a href="#cb18-400" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(true_mean)</span>
+<span id="cb18-397"><a href="#cb18-397" aria-hidden="true" tabindex="-1"></a>salary_simulation <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb18-398"><a href="#cb18-398" aria-hidden="true" tabindex="-1"></a>  <span class="at">simulation =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>,</span>
+<span id="cb18-399"><a href="#cb18-399" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean_salary =</span> <span class="fu">map_dbl</span>(simulation, <span class="sc">~</span> <span class="fu">sample_mean_salary</span>(<span class="at">sample_size =</span> <span class="dv">25</span>))</span>
+<span id="cb18-400"><a href="#cb18-400" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb18-401"><a href="#cb18-401" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-402"><a href="#cb18-402" aria-hidden="true" tabindex="-1"></a>salary_simulation <span class="sc">|&gt;</span></span>
-<span id="cb18-403"><a href="#cb18-403" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> mean_salary <span class="sc">/</span> <span class="fl">1e6</span>)) <span class="sc">+</span></span>
-<span id="cb18-404"><a href="#cb18-404" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span></span>
-<span id="cb18-405"><a href="#cb18-405" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(</span>
-<span id="cb18-406"><a href="#cb18-406" aria-hidden="true" tabindex="-1"></a>    <span class="at">xintercept =</span> true_mean_salary <span class="sc">/</span> <span class="fl">1e6</span>,</span>
-<span id="cb18-407"><a href="#cb18-407" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>,</span>
-<span id="cb18-408"><a href="#cb18-408" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="dv">1</span></span>
-<span id="cb18-409"><a href="#cb18-409" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb18-410"><a href="#cb18-410" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb18-411"><a href="#cb18-411" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Simulated Mean NBA Salaries&quot;</span>,</span>
-<span id="cb18-412"><a href="#cb18-412" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;1,000 random samples of 25 players&quot;</span>,</span>
-<span id="cb18-413"><a href="#cb18-413" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Mean Salary in Sample, in Millions&quot;</span>,</span>
-<span id="cb18-414"><a href="#cb18-414" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Number of Simulations&quot;</span>,</span>
-<span id="cb18-415"><a href="#cb18-415" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Dashed line shows the true mean salary of all players in the 2023 combined dataset&quot;</span></span>
-<span id="cb18-416"><a href="#cb18-416" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb18-417"><a href="#cb18-417" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb18-418"><a href="#cb18-418" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-419"><a href="#cb18-419" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-422"><a href="#cb18-422" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb18-423"><a href="#cb18-423" aria-hidden="true" tabindex="-1"></a>salary_simulation <span class="sc">|&gt;</span></span>
-<span id="cb18-424"><a href="#cb18-424" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb18-425"><a href="#cb18-425" aria-hidden="true" tabindex="-1"></a>    <span class="at">average_simulated_mean =</span> <span class="fu">mean</span>(mean_salary),</span>
-<span id="cb18-426"><a href="#cb18-426" aria-hidden="true" tabindex="-1"></a>    <span class="at">true_mean_salary =</span> true_mean_salary,</span>
-<span id="cb18-427"><a href="#cb18-427" aria-hidden="true" tabindex="-1"></a>    <span class="at">difference =</span> average_simulated_mean <span class="sc">-</span> true_mean_salary</span>
-<span id="cb18-428"><a href="#cb18-428" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb18-429"><a href="#cb18-429" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
-<span id="cb18-430"><a href="#cb18-430" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(</span>
-<span id="cb18-431"><a href="#cb18-431" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Average Simulated Mean Salary&quot;</span>,</span>
-<span id="cb18-432"><a href="#cb18-432" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;True Mean Salary&quot;</span>,</span>
-<span id="cb18-433"><a href="#cb18-433" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Difference&quot;</span></span>
-<span id="cb18-434"><a href="#cb18-434" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb18-435"><a href="#cb18-435" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">2</span>,</span>
-<span id="cb18-436"><a href="#cb18-436" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Comparison of Simulated and True Mean Salary&quot;</span></span>
-<span id="cb18-437"><a href="#cb18-437" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb18-438"><a href="#cb18-438" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> F,</span>
-<span id="cb18-439"><a href="#cb18-439" aria-hidden="true" tabindex="-1"></a>                <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb18-440"><a href="#cb18-440" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="at">row =</span> <span class="dv">0</span>, <span class="at">bold =</span> T, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>)</span>
-<span id="cb18-441"><a href="#cb18-441" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-442"><a href="#cb18-442" aria-hidden="true" tabindex="-1"></a>The average simulated sample salary is close to the true mean salary of all players in the dataset. Because each sample is randomly drawn from the same population of players, the sampling distribution should center around the true mean.</span>
-<span id="cb18-443"><a href="#cb18-443" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-444"><a href="#cb18-444" aria-hidden="true" tabindex="-1"></a><span class="fu">## Question 10</span></span>
-<span id="cb18-445"><a href="#cb18-445" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-446"><a href="#cb18-446" aria-hidden="true" tabindex="-1"></a>**Question 10: Using the combined 2023 dataset, create a new variable called performance_tier that classifies players as &quot;Low&quot;, &quot;Average&quot;, or &quot;High&quot; performers based on their VORP values. Then, create a faceted ggplot showing the relationship between Salary and WS/48 for each performance tier. What does the visualization suggest about whether higher-paid players are always more efficient?**</span>
-<span id="cb18-447"><a href="#cb18-447" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-448"><a href="#cb18-448" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
-<span id="cb18-449"><a href="#cb18-449" aria-hidden="true" tabindex="-1"></a>Use the qnorm() function in R to classify players performance based on VORP values. </span>
-<span id="cb18-450"><a href="#cb18-450" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb18-451"><a href="#cb18-451" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-454"><a href="#cb18-454" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb18-455"><a href="#cb18-455" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: Q10-Performance-Tier</span></span>
+<span id="cb18-402"><a href="#cb18-402" aria-hidden="true" tabindex="-1"></a>true_mean_salary <span class="ot">&lt;-</span> nba_combined <span class="sc">|&gt;</span></span>
+<span id="cb18-403"><a href="#cb18-403" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Salary.x)) <span class="sc">|&gt;</span></span>
+<span id="cb18-404"><a href="#cb18-404" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">true_mean =</span> <span class="fu">mean</span>(Salary.x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb18-405"><a href="#cb18-405" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(true_mean)</span>
+<span id="cb18-406"><a href="#cb18-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-407"><a href="#cb18-407" aria-hidden="true" tabindex="-1"></a>salary_simulation <span class="sc">|&gt;</span></span>
+<span id="cb18-408"><a href="#cb18-408" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> mean_salary <span class="sc">/</span> <span class="fl">1e6</span>)) <span class="sc">+</span></span>
+<span id="cb18-409"><a href="#cb18-409" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, <span class="at">color =</span> <span class="st">&quot;white&quot;</span>) <span class="sc">+</span></span>
+<span id="cb18-410"><a href="#cb18-410" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(</span>
+<span id="cb18-411"><a href="#cb18-411" aria-hidden="true" tabindex="-1"></a>    <span class="at">xintercept =</span> true_mean_salary <span class="sc">/</span> <span class="fl">1e6</span>,</span>
+<span id="cb18-412"><a href="#cb18-412" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>,</span>
+<span id="cb18-413"><a href="#cb18-413" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="dv">1</span></span>
+<span id="cb18-414"><a href="#cb18-414" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-415"><a href="#cb18-415" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb18-416"><a href="#cb18-416" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Simulated Mean NBA Salaries&quot;</span>,</span>
+<span id="cb18-417"><a href="#cb18-417" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;1,000 random samples of 25 players&quot;</span>,</span>
+<span id="cb18-418"><a href="#cb18-418" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Mean Salary in Sample, in Millions&quot;</span>,</span>
+<span id="cb18-419"><a href="#cb18-419" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Number of Simulations&quot;</span>,</span>
+<span id="cb18-420"><a href="#cb18-420" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Dashed line shows the true mean salary of all players in the 2023 combined dataset&quot;</span></span>
+<span id="cb18-421"><a href="#cb18-421" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-422"><a href="#cb18-422" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb18-423"><a href="#cb18-423" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-424"><a href="#cb18-424" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-427"><a href="#cb18-427" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-428"><a href="#cb18-428" aria-hidden="true" tabindex="-1"></a>salary_simulation <span class="sc">|&gt;</span></span>
+<span id="cb18-429"><a href="#cb18-429" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb18-430"><a href="#cb18-430" aria-hidden="true" tabindex="-1"></a>    <span class="at">average_simulated_mean =</span> <span class="fu">mean</span>(mean_salary),</span>
+<span id="cb18-431"><a href="#cb18-431" aria-hidden="true" tabindex="-1"></a>    <span class="at">true_mean_salary =</span> true_mean_salary,</span>
+<span id="cb18-432"><a href="#cb18-432" aria-hidden="true" tabindex="-1"></a>    <span class="at">difference =</span> average_simulated_mean <span class="sc">-</span> true_mean_salary</span>
+<span id="cb18-433"><a href="#cb18-433" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb18-434"><a href="#cb18-434" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
+<span id="cb18-435"><a href="#cb18-435" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(</span>
+<span id="cb18-436"><a href="#cb18-436" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Average Simulated Mean Salary&quot;</span>,</span>
+<span id="cb18-437"><a href="#cb18-437" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;True Mean Salary&quot;</span>,</span>
+<span id="cb18-438"><a href="#cb18-438" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Difference&quot;</span></span>
+<span id="cb18-439"><a href="#cb18-439" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb18-440"><a href="#cb18-440" aria-hidden="true" tabindex="-1"></a>    <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb18-441"><a href="#cb18-441" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Comparison of Simulated and True Mean Salary&quot;</span></span>
+<span id="cb18-442"><a href="#cb18-442" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb18-443"><a href="#cb18-443" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> F,</span>
+<span id="cb18-444"><a href="#cb18-444" aria-hidden="true" tabindex="-1"></a>                <span class="at">bootstrap_options =</span> <span class="st">&quot;striped&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb18-445"><a href="#cb18-445" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="at">row =</span> <span class="dv">0</span>, <span class="at">bold =</span> T, <span class="at">align =</span> <span class="st">&quot;c&quot;</span>)</span>
+<span id="cb18-446"><a href="#cb18-446" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-447"><a href="#cb18-447" aria-hidden="true" tabindex="-1"></a>The average simulated sample salary is close to the true mean salary of all players in the dataset. Because each sample is randomly drawn from the same population of players, the sampling distribution should center around the true mean.</span>
+<span id="cb18-448"><a href="#cb18-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-449"><a href="#cb18-449" aria-hidden="true" tabindex="-1"></a><span class="fu">## Question 10</span></span>
+<span id="cb18-450"><a href="#cb18-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-451"><a href="#cb18-451" aria-hidden="true" tabindex="-1"></a>**Question 10: Using the combined 2023 dataset, create a new variable called performance_tier that classifies players as &quot;Low&quot;, &quot;Average&quot;, or &quot;High&quot; performers based on their VORP values. Then, create a faceted ggplot showing the relationship between Salary and WS/48 for each performance tier. What does the visualization suggest about whether higher-paid players are always more efficient?**</span>
+<span id="cb18-452"><a href="#cb18-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-453"><a href="#cb18-453" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb18-454"><a href="#cb18-454" aria-hidden="true" tabindex="-1"></a>Use the qnorm() function in R to classify players performance based on VORP values. </span>
+<span id="cb18-455"><a href="#cb18-455" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb18-456"><a href="#cb18-456" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-457"><a href="#cb18-457" aria-hidden="true" tabindex="-1"></a>nba_combined_tiers <span class="ot">&lt;-</span> nba_combined <span class="sc">|&gt;</span></span>
-<span id="cb18-458"><a href="#cb18-458" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(VORP), <span class="sc">!</span><span class="fu">is.na</span>(<span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>), <span class="sc">!</span><span class="fu">is.na</span>(Salary.x)) <span class="sc">|&gt;</span></span>
-<span id="cb18-459"><a href="#cb18-459" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb18-460"><a href="#cb18-460" aria-hidden="true" tabindex="-1"></a>    <span class="at">z_vorp =</span> (VORP <span class="sc">-</span> <span class="fu">mean</span>(VORP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">/</span></span>
-<span id="cb18-461"><a href="#cb18-461" aria-hidden="true" tabindex="-1"></a>             <span class="fu">sd</span>(VORP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb18-462"><a href="#cb18-462" aria-hidden="true" tabindex="-1"></a>    <span class="at">performance_tier =</span> <span class="fu">case_when</span>(</span>
-<span id="cb18-463"><a href="#cb18-463" aria-hidden="true" tabindex="-1"></a>      z_vorp <span class="sc">&lt;</span> <span class="fu">qnorm</span>(<span class="fl">0.33</span>) <span class="sc">~</span> <span class="st">&quot;Low&quot;</span>,</span>
-<span id="cb18-464"><a href="#cb18-464" aria-hidden="true" tabindex="-1"></a>      z_vorp <span class="sc">&lt;</span> <span class="fu">qnorm</span>(<span class="fl">0.67</span>) <span class="sc">~</span> <span class="st">&quot;Average&quot;</span>,</span>
-<span id="cb18-465"><a href="#cb18-465" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;High&quot;</span></span>
-<span id="cb18-466"><a href="#cb18-466" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb18-467"><a href="#cb18-467" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb18-468"><a href="#cb18-468" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-469"><a href="#cb18-469" aria-hidden="true" tabindex="-1"></a>nba_combined_tiers <span class="sc">|&gt;</span></span>
-<span id="cb18-470"><a href="#cb18-470" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>, <span class="at">y =</span> Salary.x <span class="sc">/</span> <span class="fl">1e6</span>)) <span class="sc">+</span></span>
-<span id="cb18-471"><a href="#cb18-471" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb18-472"><a href="#cb18-472" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb18-473"><a href="#cb18-473" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(performance_tier)) <span class="sc">+</span></span>
-<span id="cb18-474"><a href="#cb18-474" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_dollar</span>(<span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb18-475"><a href="#cb18-475" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb18-476"><a href="#cb18-476" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Salary and Efficiency by Performance Tier&quot;</span>,</span>
-<span id="cb18-477"><a href="#cb18-477" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Players are grouped using standardized VORP values&quot;</span>,</span>
-<span id="cb18-478"><a href="#cb18-478" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Win Shares per 48 Minutes (WS/48)&quot;</span>,</span>
-<span id="cb18-479"><a href="#cb18-479" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Salary in Millions&quot;</span>,</span>
-<span id="cb18-480"><a href="#cb18-480" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Kaggle NBA datasets, 2023 season&quot;</span></span>
-<span id="cb18-481"><a href="#cb18-481" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb18-482"><a href="#cb18-482" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb18-483"><a href="#cb18-483" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-484"><a href="#cb18-484" aria-hidden="true" tabindex="-1"></a>The visualization suggests that higher-paid players are not always more efficient. While high performance players may generally earn more, there are still players with relatively low salaries who have strong WS/48 values. This shows that salary is related to performance, but it does not perfectly measure efficiency. Some lower-paid players provide strong value, while some higher-paid players do not produce proportionally higher win-share efficiency. This may be due partly becuase of rookie-scale contracts where players in their first few years in the NBA are obligated to a small contract. </span>
+<span id="cb18-459"><a href="#cb18-459" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-460"><a href="#cb18-460" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: Q10-Performance-Tier</span></span>
+<span id="cb18-461"><a href="#cb18-461" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-462"><a href="#cb18-462" aria-hidden="true" tabindex="-1"></a>nba_combined_tiers <span class="ot">&lt;-</span> nba_combined <span class="sc">|&gt;</span></span>
+<span id="cb18-463"><a href="#cb18-463" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(VORP), <span class="sc">!</span><span class="fu">is.na</span>(<span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>), <span class="sc">!</span><span class="fu">is.na</span>(Salary.x)) <span class="sc">|&gt;</span></span>
+<span id="cb18-464"><a href="#cb18-464" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb18-465"><a href="#cb18-465" aria-hidden="true" tabindex="-1"></a>    <span class="at">z_vorp =</span> (VORP <span class="sc">-</span> <span class="fu">mean</span>(VORP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">/</span></span>
+<span id="cb18-466"><a href="#cb18-466" aria-hidden="true" tabindex="-1"></a>             <span class="fu">sd</span>(VORP, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-467"><a href="#cb18-467" aria-hidden="true" tabindex="-1"></a>    <span class="at">performance_tier =</span> <span class="fu">case_when</span>(</span>
+<span id="cb18-468"><a href="#cb18-468" aria-hidden="true" tabindex="-1"></a>      z_vorp <span class="sc">&lt;</span> <span class="fu">qnorm</span>(<span class="fl">0.33</span>) <span class="sc">~</span> <span class="st">&quot;Low&quot;</span>,</span>
+<span id="cb18-469"><a href="#cb18-469" aria-hidden="true" tabindex="-1"></a>      z_vorp <span class="sc">&lt;</span> <span class="fu">qnorm</span>(<span class="fl">0.67</span>) <span class="sc">~</span> <span class="st">&quot;Average&quot;</span>,</span>
+<span id="cb18-470"><a href="#cb18-470" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;High&quot;</span></span>
+<span id="cb18-471"><a href="#cb18-471" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-472"><a href="#cb18-472" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-473"><a href="#cb18-473" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-474"><a href="#cb18-474" aria-hidden="true" tabindex="-1"></a>nba_combined_tiers <span class="sc">|&gt;</span></span>
+<span id="cb18-475"><a href="#cb18-475" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">`</span><span class="at">WS/48</span><span class="st">`</span>, <span class="at">y =</span> Salary.x <span class="sc">/</span> <span class="fl">1e6</span>)) <span class="sc">+</span></span>
+<span id="cb18-476"><a href="#cb18-476" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.6</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb18-477"><a href="#cb18-477" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb18-478"><a href="#cb18-478" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(performance_tier)) <span class="sc">+</span></span>
+<span id="cb18-479"><a href="#cb18-479" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span><span class="fu">label_dollar</span>(<span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb18-480"><a href="#cb18-480" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb18-481"><a href="#cb18-481" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Salary and Efficiency by Performance Tier&quot;</span>,</span>
+<span id="cb18-482"><a href="#cb18-482" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Players are grouped using standardized VORP values&quot;</span>,</span>
+<span id="cb18-483"><a href="#cb18-483" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Win Shares per 48 Minutes (WS/48)&quot;</span>,</span>
+<span id="cb18-484"><a href="#cb18-484" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Salary in Millions&quot;</span>,</span>
+<span id="cb18-485"><a href="#cb18-485" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: Kaggle NBA datasets, 2023 season&quot;</span></span>
+<span id="cb18-486"><a href="#cb18-486" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-487"><a href="#cb18-487" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb18-488"><a href="#cb18-488" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-489"><a href="#cb18-489" aria-hidden="true" tabindex="-1"></a>The visualization suggests that higher-paid players are not always more efficient. While high performance players may generally earn more, there are still players with relatively low salaries who have strong WS/48 values. This shows that salary is related to performance, but it does not perfectly measure efficiency. Some lower-paid players provide strong value, while some higher-paid players do not produce proportionally higher win-share efficiency. This may be due partly becuase of rookie-scale contracts where players in their first few years in the NBA are obligated to a small contract. </span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

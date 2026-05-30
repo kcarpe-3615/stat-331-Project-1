@@ -322,9 +322,10 @@ The diagnostic plots suggest that the model is useful for identifying general re
 salary_summary <- nba_combined |>
   filter(!is.na(Salary.x), !is.na(`WS/48`), !is.na(VORP)) |>
   mutate(
+    salary_z = (Salary.x - mean(Salary.x, na.rm = TRUE)) / sd(Salary.x, na.rm = TRUE),
     salary_category = case_when(
-      Salary.x <= quantile(Salary.x, 0.33, na.rm = TRUE) ~ "Low Salary",
-      Salary.x <= quantile(Salary.x, 0.67, na.rm = TRUE) ~ "Middle Salary",
+      salary_z <= qnorm(0.33) ~ "Low Salary",
+      salary_z <= qnorm(0.67) ~ "Middle Salary",
       TRUE ~ "High Salary"
     )
   ) |>
@@ -340,14 +341,18 @@ salary_summary <- nba_combined |>
 
 salary_summary |>
   kable(
-    col.names = c("Salary Category", "Number of Players",
-                  "Median Salary",
-                  "Median WS/48", "Median VORP"),
+    col.names = c(
+      "Salary Category", "Number of Players",
+      "Median Salary", "Median WS/48", "Median VORP"
+    ),
     digits = 2,
-    caption = "Performance Summary by Salary Category") |> 
-  kable_styling(full_width = F,
-                bootstrap_options = "striped") |> 
-  row_spec(row = 0, bold = T, align = "c")
+    caption = "Performance Summary by Salary Category"
+  ) |>
+  kable_styling(
+    full_width = FALSE,
+    bootstrap_options = "striped"
+  ) |>
+  row_spec(row = 0, bold = TRUE, align = "c")
 ```
 
 Based on the summary table, the best overall performance value seems to be the high salary players which makes intuitive sense because players get payed more for good performance.
