@@ -147,13 +147,6 @@ Create a function that returns a data frame, not a `kable()` table. This makes i
 # Code for Question 6
 ```
 
-
-```{r}
-#| label: Q6-Best-Value-Function
-
-# Code for Question 6 Continued
-```
-
 *Answer question here*
 
 ## Question 7

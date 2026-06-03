@@ -284,33 +284,6 @@ all_positions_value |>
   )
 ```
 
-
-```{r}
-#| label: Q6-Best-Value-Function
-
-
-#Find positions with more than 10 players
-positions_to_check <- nba_combined |>
-  count(Position) |>
-  filter(n > 10) |>
-  pull(Position)
-
-#Iterate the function over every qualifying position, stacking results
-all_positions_value <- map_dfr(positions_to_check, position_value_df)
-
-#Display the top 10 best-value players in the dataset
-all_positions_value |>
-  arrange(dollar_salary_per_WS48) |>
-  slice_head(n = 10) |>
-  kable(
-    col.names = c("Player", "Position",
-                  "Salary", "WS/48",
-                  "VORP", "Games Missed",
-                  "Salary per WS/48"),
-    digits = 2,
-    caption = "Top 10 Best Contract Values in the NBA (2023 Season)")
-```
-
 The resulting table reveals the players providing the most win-share production per dollar of salary across the entire league. Many of these players tend to be on rookie-scale or minimum contracts, since their salaries are capped by collective bargaining rules even when their on-court production is strong. This pattern is consistent with the position-level findings from Questions 3 and 4 — younger, less expensive players (often point guards still on their rookie deals) frequently top the value rankings, while veterans on max contracts rarely appear, even when their production is excellent.
 
 ## Question 7
