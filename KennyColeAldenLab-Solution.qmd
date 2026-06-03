@@ -125,21 +125,33 @@ To avoid outputting the entire list, insert another argument function to only ou
 ```{r}
 #| label: Q3-Position-Function
 
+library(scales)
+
 position_value <- function(pos_name, n_players) {
   nba_combined |>
     filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
-    mutate(salary_per_WS48 = Salary.x / `WS/48`) |>
-    select(`Player Name`, Position,
-           dollar(Salary.x), `WS/48`,
-           VORP, `Games Missed`,
-           dollar(salary_per_WS48)) |>
+    mutate(
+      salary_per_WS48 = Salary.x / `WS/48`,
+      Salary_USD = dollar(Salary.x),
+      salary_per_WS48_USD = dollar(salary_per_WS48)
+    ) |>
+    select(
+      `Player Name`, Position,
+      Salary_USD, `WS/48`,
+      VORP, `Games Missed`,
+      salary_per_WS48_USD
+    ) |>
     arrange(salary_per_WS48) |>
     slice_head(n = n_players) |>
-    kable(col.names = c("Player", "Position",
-                        "Salary (USD)", "WS/48",
-                        "VORP", "Games Missed",
-                        "Salary per WS/48"),
-      digits = 2)
+    kable(
+      col.names = c(
+        "Player", "Position",
+        "Salary (USD)", "WS/48",
+        "VORP", "Games Missed",
+        "Salary per WS/48 (USD)"
+      ),
+      digits = 2
+    )
 }
 
 position_value("PG", 5)
@@ -247,7 +259,7 @@ position_value_df <- function(pos_name) {
     filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
     mutate(salary_per_WS48 = Salary.x / `WS/48`) |>
     select(`Player Name`, Position,
-           Salary.x, `WS/48`,
+           dollar(Salary.x), `WS/48`,
            VORP, `Games Missed`,
            salary_per_WS48)
 }
