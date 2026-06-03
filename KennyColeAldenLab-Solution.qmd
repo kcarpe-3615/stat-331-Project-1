@@ -255,11 +255,11 @@ Create a function that returns a data frame, not a `kable()` table. This makes i
 position_value_df <- function(pos_name) {
   nba_combined |>
     filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
-    mutate(salary_per_WS48 = Salary.x / `WS/48`) |>
+    mutate(salary_per_WS48 = Salary.x / `WS/48`, dollar_salary = dollar(Salary.x), dollar_salary_per_WS48 = dollar(salary_per_WS48)) |>
     select(`Player Name`, Position,
-           dollar(Salary.x), `WS/48`,
+           dollar_salary, `WS/48`,
            VORP, `Games Missed`,
-           salary_per_WS48)
+           dollar_salary_per_WS48)
 }
 
 #Find positions with more than 10 players
@@ -273,7 +273,7 @@ all_positions_value <- map_dfr(positions_to_check, position_value_df)
 
 #Display the top 10 best-value players in the dataset
 all_positions_value |>
-  arrange(salary_per_WS48) |>
+  arrange(dollar_salary_per_WS48) |>
   slice_head(n = 10) |>
   kable(
     col.names = c("Player", "Position",
@@ -347,6 +347,7 @@ The diagnostic plots suggest that the model is useful for identifying general re
 salary_summary <- nba_combined |>
   filter(!is.na(Salary.x), !is.na(`WS/48`), !is.na(VORP)) |>
   mutate(
+    dollar_salary = dollar(Salary.x),
     salary_z = (Salary.x - mean(Salary.x, na.rm = TRUE)) / sd(Salary.x, na.rm = TRUE),
     salary_category = case_when(
       salary_z <= qnorm(0.33) ~ "Low Salary",
@@ -357,7 +358,7 @@ salary_summary <- nba_combined |>
   group_by(salary_category) |>
   summarize(
     players = n(),
-    median_salary = median(Salary.x, na.rm = TRUE),
+    median_salary = median(dollar_salary, na.rm = TRUE),
     median_WS48 = median(`WS/48`, na.rm = TRUE),
     median_VORP = median(VORP, na.rm = TRUE),
     .groups = "drop"
