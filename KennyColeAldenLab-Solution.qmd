@@ -125,8 +125,6 @@ To avoid outputting the entire list, insert another argument function to only ou
 ```{r}
 #| label: Q3-Position-Function
 
-library(scales)
-
 position_value <- function(pos_name, n_players) {
   nba_combined |>
     filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
@@ -141,7 +139,7 @@ position_value <- function(pos_name, n_players) {
       VORP, `Games Missed`,
       salary_per_WS48_USD
     ) |>
-    arrange(salary_per_WS48) |>
+    arrange(salary_per_WS48_USD) |>
     slice_head(n = n_players) |>
     kable(
       col.names = c(
