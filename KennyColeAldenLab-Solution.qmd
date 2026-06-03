@@ -1,5 +1,5 @@
 ---
-title: "Project Checkpoint 4"
+title: "Lab Solutions"
 author: "Kenny, Cole, Alden"
 format: 
   html:
@@ -128,28 +128,22 @@ To avoid outputting the entire list, insert another argument function to only ou
 position_value <- function(pos_name, n_players) {
   nba_combined |>
     filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
-    mutate(
-      salary_per_WS48 = Salary.x / `WS/48`,
-      Salary_USD = dollar(Salary.x),
-      salary_per_WS48_USD = dollar(salary_per_WS48)
-    ) |>
-    select(
-      `Player Name`, Position,
-      Salary_USD, `WS/48`,
-      VORP, `Games Missed`,
-      salary_per_WS48_USD
-    ) |>
-    arrange(salary_per_WS48_USD) |>
-    slice_head(n = n_players) |>
-    kable(
-      col.names = c(
-        "Player", "Position",
-        "Salary (USD)", "WS/48",
-        "VORP", "Games Missed",
-        "Salary per WS/48 (USD)"
-      ),
-      digits = 2
-    )
+    mutate(salary_per_WS48 = Salary.x / `WS/48`,
+           Salary_USD = dollar(Salary.x),
+           salary_per_WS48_USD = dollar(salary_per_WS48)) |>
+    select(`Player Name`, Position,
+       Salary_USD, `WS/48`,
+       VORP, `Games Missed`,
+       salary_per_WS48_USD, 
+       salary_per_WS48) |>
+    arrange(salary_per_WS48) |>
+    slice_head(n = 5) |> 
+    select(-salary_per_WS48) |> 
+    kable(col.names = c("Player", "Position",
+                        "Salary (USD)", "WS/48",
+                        "VORP", "Games Missed",
+                        "Salary per WS/48 (USD)"),
+          digits = 2)
 }
 
 position_value("PG", 5)
@@ -194,11 +188,11 @@ nba_combined |>
   )
 ```
 
-Based on the graph, there does not appear to be a significant difference in the slopes of WS / 48 per million dollar increase in salary for each player position. However, the Center's trend line sits noticeably higher than the others at most salary levels suggesting that Centers tend to produce more win shares than other positions.
+Based on the graph, there does not appear to be a significant difference in the slopes of WS / 48 per million dollar increase in salary for each player position. However, the Center's trend line sits noticeably higher than the others at most salary levels suggesting that Centers tend to produce more win shares than other positions across all NBA salaries.
 
 ## Question 5
 
-While much of NBA analysis focuses on performance and salary, player availability is just as important. Our dataset includes an `Injury` column containing free-text descriptions of each player's injury that season (e.g., "sprained left ankle," "torn ACL"). By extracting keywords from these descriptions, we can group similar injuries together and analyze how different injury types impact player availability.
+While much of NBA analysis focuses on performance and salary, player availability is just as important. Our dataset includes an `Injury` column containing descriptions of each player's injury that season (e.g., "sprained left ankle," "torn ACL"). By extracting keywords from these descriptions, we can group similar injuries together and analyze how different injury types impact player availability.
 
 **5. Create a new variable called `injury_category` that classifies each player's injury as `"Knee"`, `"Ankle"`, `"Back"`, `"Hamstring"`, `"Other"`, or `"None"` based on keywords found in the `Injury` text. Then, create a nicely formatted table summarizing the number of players and the median number of games missed for each injury category, ordered from most to fewest median games missed. Which type of injury appears to be the most costly in terms of player availability?**
 
@@ -236,7 +230,7 @@ nba_combined |>
   row_spec(row = 0, bold = T, align = "c")
 ````
 
-Based on the table, knee injuries appear to be the most costly in terms of player availability — players with knee injuries miss substantially more games on average than players with injuries to other body parts. This makes intuitive sense given that serious knee injuries (such as ACL or meniscus tears) often require surgery and lengthy rehabilitation, whereas ankle and hamstring injuries tend to heal more quickly. Teams may want to weigh injury history, especially knee-related injuries more heavily when evaluating player contracts.
+Based on the table, knee injuries appear to be the most costly in terms of player availability, players with knee injuries miss substantially more games on average than players with injuries to other body parts. This makes intuitive sense given that serious knee injuries (such as ACL or meniscus tears) often require surgery and lengthy rehabilitation, whereas ankle and hamstring injuries tend to heal more quickly. Teams may want to weigh injury history, especially knee-related injuries more heavily when evaluating player contracts.
 
 ## Question 6
 
@@ -251,16 +245,49 @@ Create a function that returns a data frame, not a `kable()` table. This makes i
 ```{r}
 #| label: Q6-Best-Value-Function
 
-#Modified version
 position_value_df <- function(pos_name) {
   nba_combined |>
     filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
-    mutate(salary_per_WS48 = Salary.x / `WS/48`, dollar_salary = dollar(Salary.x), dollar_salary_per_WS48 = dollar(salary_per_WS48)) |>
+    mutate(
+      salary_per_WS48 = Salary.x / `WS/48`,
+      dollar_salary = dollar(Salary.x),
+      dollar_salary_per_WS48 = dollar(salary_per_WS48)
+    ) |>
     select(`Player Name`, Position,
            dollar_salary, `WS/48`,
            VORP, `Games Missed`,
+           salary_per_WS48,
            dollar_salary_per_WS48)
 }
+
+#Find positions with more than 10 players
+positions_to_check <- nba_combined |>
+  count(Position) |>
+  filter(n > 10) |>
+  pull(Position)
+
+#Iterate the function over every qualifying position, stacking results
+all_positions_value <- map_dfr(positions_to_check, position_value_df)
+
+# Display top 10 players in dataset
+all_positions_value |>
+  arrange(salary_per_WS48) |>
+  slice_head(n = 10) |>
+  select(-salary_per_WS48) |>
+  kable(
+    col.names = c("Player", "Position",
+                  "Salary", "WS/48",
+                  "VORP", "Games Missed",
+                  "Salary per WS/48"),
+    digits = 2,
+    caption = "Top 10 Best Contract Values in the NBA (2023 Season)"
+  )
+```
+
+
+```{r}
+#| label: Q6-Best-Value-Function
+
 
 #Find positions with more than 10 players
 positions_to_check <- nba_combined |>
@@ -335,7 +362,7 @@ salary_model |>
   theme(aspect.ratio = 1)
 
 ```
-The diagnostic plots suggest that the model is useful for identifying general relationships, but salary data is likely skewed because a small number of star players earn much more than the rest of the league due to max contracts. This may create some unequal variance and influential observations, so the model assumptions may not be met. In addition, the residula plot seems to have a decreasing spread of residuals as fitted salary increases.
+The diagnostic plots suggest that the model is useful for identifying general relationships, but salary data is likely skewed because a small number of star players earn much more than the rest of the league due to max contracts. This may create some unequal variance and influential observations, so the model assumptions may not be met. In addition, the residual plot seems to have a decreasing spread of residuals as fitted salary increases.
 
 ## Question 8
 
@@ -347,7 +374,6 @@ The diagnostic plots suggest that the model is useful for identifying general re
 salary_summary <- nba_combined |>
   filter(!is.na(Salary.x), !is.na(`WS/48`), !is.na(VORP)) |>
   mutate(
-    dollar_salary = dollar(Salary.x),
     salary_z = (Salary.x - mean(Salary.x, na.rm = TRUE)) / sd(Salary.x, na.rm = TRUE),
     salary_category = case_when(
       salary_z <= qnorm(0.33) ~ "Low Salary",
@@ -358,12 +384,13 @@ salary_summary <- nba_combined |>
   group_by(salary_category) |>
   summarize(
     players = n(),
-    median_salary = median(dollar_salary, na.rm = TRUE),
+    median_salary = median(Salary.x, na.rm = TRUE),
     median_WS48 = median(`WS/48`, na.rm = TRUE),
     median_VORP = median(VORP, na.rm = TRUE),
     .groups = "drop"
   ) |>
-  arrange(desc(median_WS48))
+  arrange(desc(median_WS48)) |>
+  mutate(median_salary = dollar(median_salary))
 
 salary_summary |>
   kable(
@@ -381,7 +408,7 @@ salary_summary |>
   row_spec(row = 0, bold = TRUE, align = "c")
 ```
 
-Based on the summary table, the best overall performance value seems to be the high salary players which makes intuitive sense because players get payed more for good performance.
+Based on the summary table, the best overall performance value seems to be the high salary players which makes intuitive sense because players get paid more for good performance.
 
 ## Question 9
 
