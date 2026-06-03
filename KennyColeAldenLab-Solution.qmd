@@ -57,7 +57,7 @@ nba_combined <- nba_salary |>
   select(`Player Name`, Position, Salary) |>
   inner_join(nba_data,
              by = c("Player Name" = "Player")) |> 
-  filter(Season == 2023)
+  filter(Season == 2023, `WS/48` > -.4)
 ```
 
 ## Question 2
@@ -74,7 +74,7 @@ Now that we have the combined dataset, we would like to analyze high performing 
 **Only include positions with more than 10 players, and order the rows from highest to lowest median Win Shares.**
 
 ::: {.callout-tip}
-Use KableExtra or gt styling in order to improve the appearance of your tables.
+Use KableExtra or gt styling in order to improve the appearance of your tables. In addition, use the package 'scales' to format dollar output for relevant columns. 
 :::
 
 ```{r}
@@ -164,15 +164,15 @@ nba_combined |>
   filter(n() > 10) |>
   ungroup() |>
   filter(!is.na(`WS/48`), !is.na(Salary.x)) |>
-  ggplot(aes(x = `WS/48`, y = Salary.x / 1e6, color = Position)) +
+  ggplot(aes(x = Salary.x / 1e6 , y =`WS/48`, color = Position)) +
   geom_point(alpha = 0.6, size = 2) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
-  scale_y_continuous(labels = scales::label_dollar(suffix = "M")) +
+  scale_x_continuous(labels = scales::label_dollar(suffix = "M")) +
   labs(
     title = "Salary vs. Win Shares per 48 Minutes by Position",
     subtitle = "Flatter trend lines indicate positions where higher salaries are not strongly tied to better production",
-    x = "Win Shares per 48 Minutes (WS/48)",
-    y = "Salary (2023 Season)",
+    x = "Salary (2023 Season)",
+    y = "Win Shares per 48 Minutes (WS/48)",
     color = "Position",
     caption = "Source: Kaggle NBA datasets (2020–2023)"
   ) +
@@ -184,11 +184,11 @@ nba_combined |>
   )
 ```
 
-Based on the graph, point guards (PG) appear to provide the best value relative to salary and tend to cluster in the higher WS/48 range without commanding the highest salaries, meaning teams are getting strong per-minute production at a lower cost. Centers (C), by contrast, show a wider salary spread without a proportional increase in WS/48, suggesting some centers are overpaid relative to their win-share contribution. This is consistent with the conclusion from Question 3, where PGs had a lower salary-per-WS/48 than Cs.
+Based on the graph, there does not appear to be a significant difference in the slopes of WS / 48 per million dollar increase in salary for each player position. However, the Center's trend line sits noticeably higher than the others at most salary levels suggesting that Centers tend to produce more win shares than other positions.
 
 ## Question 5
 
-While much of NBA analysis focuses on performance and salary, player availability is just as important — a star player who frequently misses games provides less value to their team than their per-game stats might suggest. Our dataset includes an `Injury` column containing free-text descriptions of each player's injury that season (e.g., "sprained left ankle," "torn ACL"). By extracting keywords from these descriptions, we can group similar injuries together and analyze how different injury types impact player availability.
+While much of NBA analysis focuses on performance and salary, player availability is just as important. Our dataset includes an `Injury` column containing free-text descriptions of each player's injury that season (e.g., "sprained left ankle," "torn ACL"). By extracting keywords from these descriptions, we can group similar injuries together and analyze how different injury types impact player availability.
 
 **5. Create a new variable called `injury_category` that classifies each player's injury as `"Knee"`, `"Ankle"`, `"Back"`, `"Hamstring"`, `"Other"`, or `"None"` based on keywords found in the `Injury` text. Then, create a nicely formatted table summarizing the number of players and the median number of games missed for each injury category, ordered from most to fewest median games missed. Which type of injury appears to be the most costly in terms of player availability?**
 
@@ -444,7 +444,7 @@ The average simulated sample salary is close to the true mean salary of all play
 **Question 10: Using the combined 2023 dataset, create a new variable called performance_tier that classifies players as "Low", "Average", or "High" performers based on their VORP values. Then, create a faceted ggplot showing the relationship between Salary and WS/48 for each performance tier. What does the visualization suggest about whether higher-paid players are always more efficient?**
 
 ::: {.callout-tip}
-Use the qnorm() function in R to classify players performance based on VORP values. 
+Use the qnorm() function in R to classify players performance based on VORP values. Let a VORP value in the 33rd percentile be classified as "Low", between the 33rd and 67th percentile be classified as "Average" and anything higher be classified as "High". 
 :::
 
 ```{r}
@@ -459,22 +459,30 @@ nba_combined_tiers <- nba_combined |>
       z_vorp < qnorm(0.33) ~ "Low",
       z_vorp < qnorm(0.67) ~ "Average",
       TRUE ~ "High"
+    ),
+     performance_tier = factor(
+      performance_tier,
+      levels = c("Low", "Average", "High")
     )
   )
 
 nba_combined_tiers |>
-  ggplot(aes(x = `WS/48`, y = Salary.x / 1e6)) +
+  ggplot(aes(x = `Salary.x` / 1e6, y =`WS/48`)) +
   geom_point(alpha = 0.6, size = 2) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
   facet_wrap(vars(performance_tier)) +
-  scale_y_continuous(labels = scales::label_dollar(suffix = "M")) +
+  scale_x_continuous(labels = scales::label_dollar(suffix = "M")) +
   labs(
     title = "Salary and Efficiency by Performance Tier",
     subtitle = "Players are grouped using standardized VORP values",
-    x = "Win Shares per 48 Minutes (WS/48)",
-    y = "Salary in Millions",
+    x = "Salary in Millions",
+    y = "Win Shares per 48 Minutes (WS/48)",
     caption = "Source: Kaggle NBA datasets, 2023 season"
   ) +
-  theme_minimal()
+  theme_minimal() +
+theme(
+  axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+  panel.spacing = unit(1.5, "lines")
+)
 ```
-The visualization suggests that higher-paid players are not always more efficient. While high performance players may generally earn more, there are still players with relatively low salaries who have strong WS/48 values. This shows that salary is related to performance, but it does not perfectly measure efficiency. Some lower-paid players provide strong value, while some higher-paid players do not produce proportionally higher win-share efficiency. This may be due partly becuase of rookie-scale contracts where players in their first few years in the NBA are obligated to a small contract. 
+The visualization suggests that higher-paid players are not always more efficient. While high performance players may generally earn more, there are still players with relatively low salaries who have strong WS/48 values. This shows that salary is related to performance, but it does not perfectly measure efficiency. Some lower-paid players provide strong value, while some higher-paid players do not produce proportionally higher win-share efficiency. This may be due partly because of rookie-scale contracts where players in their first few years in the NBA are obligated to a small contract. 
