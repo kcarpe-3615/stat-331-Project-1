@@ -429,24 +429,31 @@ salary_simulation |>
 ```
 
 ```{r}
+
 salary_simulation |>
   summarize(
     average_simulated_mean = mean(mean_salary),
     true_mean_salary = true_mean_salary,
     difference = average_simulated_mean - true_mean_salary
   ) |>
+  mutate(
+    average_simulated_mean = dollar(average_simulated_mean),
+    true_mean_salary = dollar(true_mean_salary),
+    difference = dollar(difference)
+  ) |>
   kable(
     col.names = c(
-      "Average Simulated Mean Salary",
-      "True Mean Salary",
-      "Difference"
+      "Average Simulated Mean Salary (USD)",
+      "True Mean Salary (USD)",
+      "Difference (USD)"
     ),
-    digits = 2,
     caption = "Comparison of Simulated and True Mean Salary"
   ) |> 
-  kable_styling(full_width = F,
-                bootstrap_options = "striped") |> 
-  row_spec(row = 0, bold = T, align = "c")
+  kable_styling(
+    full_width = FALSE,
+    bootstrap_options = "striped"
+  ) |> 
+  row_spec(row = 0, bold = TRUE, align = "c")
 ```
 The average simulated sample salary is close to the true mean salary of all players in the dataset. Because each sample is randomly drawn from the same population of players, the sampling distribution should center around the true mean.
 
