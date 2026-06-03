@@ -130,13 +130,13 @@ position_value <- function(pos_name, n_players) {
     filter(Position == pos_name, !is.na(`WS/48`), `WS/48` > 0) |>
     mutate(salary_per_WS48 = Salary.x / `WS/48`) |>
     select(`Player Name`, Position,
-           Salary.x, `WS/48`,
+           dollar(Salary.x), `WS/48`,
            VORP, `Games Missed`,
-           salary_per_WS48) |>
+           dollar(salary_per_WS48)) |>
     arrange(salary_per_WS48) |>
     slice_head(n = n_players) |>
     kable(col.names = c("Player", "Position",
-                        "Salary", "WS/48",
+                        "Salary (USD)", "WS/48",
                         "VORP", "Games Missed",
                         "Salary per WS/48"),
       digits = 2)
