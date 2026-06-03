@@ -39,6 +39,7 @@ library(tidyverse)
 library(knitr)
 library(broom)
 library(kableExtra)
+library(scales)
 
 # Read in the Datasets
 nba_data <- read_csv("nba_data.csv")
@@ -80,21 +81,35 @@ Use KableExtra or gt styling in order to improve the appearance of your tables.
 #| label: Q2-Median-Table
 
 nba_combined |>
-  mutate(tot_median = median(Salary.x, na.rm = T)) |> 
+  mutate(tot_median = median(Salary.x, na.rm = TRUE)) |> 
   group_by(Position) |>
-  summarize(`median_WS/48` = median(`WS/48`, na.rm = T),
-            median_position = median(Salary.x, na.rm = T),
-            salary_difference = median_position - mean(tot_median),
-            players = n()) |>
+  summarize(
+    `median_WS/48` = median(`WS/48`, na.rm = TRUE),
+    median_position = median(Salary.x, na.rm = TRUE),
+    salary_difference = median_position - mean(tot_median),
+    players = n()
+  ) |>
   filter(players > 10) |> 
   arrange(desc(`median_WS/48`)) |>
-  kable(col.names = c("Position", "Median WS/48",
-                      "Median Salary", "Positional Salary Difference",
-                      "Number of Players"), 
-        caption = "Median NBA Salary Table by Position") |> 
-  kable_styling(full_width = F,
-                bootstrap_options = "striped") |> 
-  row_spec(row = 0, bold = T, align = "c")
+  mutate(
+    median_position = dollar(median_position),
+    salary_difference = dollar(salary_difference)
+  ) |>
+  kable(
+    col.names = c(
+      "Position", 
+      "Median WS/48",
+      "Median Salary (USD)", 
+      "Positional Salary Difference (USD)",
+      "Number of Players"
+    ), 
+    caption = "Median NBA Salary Table by Position"
+  ) |> 
+  kable_styling(
+    full_width = FALSE,
+    bootstrap_options = "striped"
+  ) |> 
+  row_spec(row = 0, bold = TRUE, align = "c")
 ```
 
 ## Question 3

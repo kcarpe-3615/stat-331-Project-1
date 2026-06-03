@@ -38,6 +38,7 @@ These datasets are collectively useful to analyze player productivity, salary tr
 library(tidyverse)
 library(knitr)
 library(broom)
+library(scales)
 library(kableExtra)
 
 # Read in the Datasets
